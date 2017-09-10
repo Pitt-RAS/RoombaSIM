@@ -18,7 +18,7 @@ Behavior:
 
 import numpy as np
 
-import config as cfg
+import roombasim.config as cfg
 
 class Roomba(object):
     '''

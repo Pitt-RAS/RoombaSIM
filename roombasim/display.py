@@ -17,9 +17,9 @@ from pyglet.gl import *
 import numpy as np
 import time
 
-import config as cfg
+import roombasim.config as cfg
 
-import roomba
+from roombasim import roomba
 
 class Display(pyglet.window.Window):
 

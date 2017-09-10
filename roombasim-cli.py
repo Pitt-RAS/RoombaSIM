@@ -7,9 +7,9 @@ CLI interface for various functions.
 import pyglet
 import argparse
 
-import display
-import config as cfg
-import mission
+from roombasim.display import Display
+import roombasim.config as cfg
+from roombasim.mission import Mission
 
 def main():
     parser = argparse.ArgumentParser()
@@ -45,11 +45,11 @@ def run_demo(args):
         cfg.MISSION_OBSTACLE_SPAWN_RADIUS = args.obstacle_spawn_radius
 
     # setup mission
-    m = mission.Mission()
+    m = Mission()
     m.setup()
 
     config = pyglet.gl.Config(sample_buffers=1, samples=4)
-    window = display.Display(m)
+    window = Display(m)
 
     pyglet.app.run()
 

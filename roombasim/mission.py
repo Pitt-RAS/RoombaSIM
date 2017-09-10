@@ -12,8 +12,8 @@ the collision dict.
 
 import numpy as np
 
-import config as cfg
-import roomba
+import roombasim.config as cfg
+from roombasim import roomba
 
 class Mission(object):
     '''
@@ -81,6 +81,7 @@ class Mission(object):
             rba = self.roombas[i]
             rba.update(delta, elapsed)
 
+            # Perform collision detection
             for j in range(len(self.roombas)):
                 if i == j:
                     continue
@@ -89,6 +90,10 @@ class Mission(object):
                     if Mission._check_roomba_is_facing(rba, self.roombas[j]):
                         rba.collisions['front'] = True
 
+            # Check if the roomba has left the arena
+            # (has_left, side) = Mission._check_bounds(rba)
+            # if has_left:
+            #     rba.stop()
 
     @staticmethod
     def _check_roomba_collision(ra, rb):
@@ -123,3 +128,14 @@ class Mission(object):
         '''
         return abs((((a - b) + cfg.PI) % cfg.TAU) - cfg.PI)
     
+    def _check_bounds(r):
+        '''
+        Check if a roomba has left the arena.
+
+        Returns (has_left, reward):
+
+        has_left - True if the roomba is outside the arena
+        reward - 1 only if the roomba crossed the goal line,
+            0 otherwise
+        '''
+        pass

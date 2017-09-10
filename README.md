@@ -23,7 +23,7 @@ The simulator is written entirely in python and requires the following python li
 You can run a simple roomba movement demo using the CLI:
 
 ```bash
-$ python roombasim.py demo {params}
+$ python roombasim-cli.py demo {params}
 
 Optional params:
     -num_targets
@@ -36,8 +36,8 @@ For example:
 
 ```bash
 # default args
-$ python roombasim.py demo
+$ python roombasim-cli.py demo
 
 # custom args
-$ python roombasim.py demo -num_targets=4 -num_obstacles=2 -target_spawn_radius=0.5 -obstacle_spawn_radius=2
+$ python roombasim-cli.py demo -num_targets=4 -num_obstacles=2 -target_spawn_radius=0.5 -obstacle_spawn_radius=2
 ```
