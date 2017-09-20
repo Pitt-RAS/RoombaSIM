@@ -1,7 +1,7 @@
 '''
-mission.py
+environment.py
 
-Contains a Mission class that can be used to
+Contains an Environment class that can be used to
 setup initial configurations and perform game-wide
 update steps.
 
@@ -13,9 +13,9 @@ the collision dict.
 import numpy as np
 
 import roombasim.config as cfg
-from roombasim import roomba
+from roombasim import roomba, geometry
 
-class Mission(object):
+class Environment(object):
     '''
     A class to represent a game round.
 
@@ -25,9 +25,9 @@ class Mission(object):
 
     def __init__(self):
         self.roombas = []
-        self.quad = None
+        self.agent = None
 
-    def setup(self):
+    def reset(self):
         '''
         Spawns roombas and positions them as follows:
 
@@ -39,6 +39,8 @@ class Mission(object):
         centered at the origin. Roombas move clockwise around
         the circle.
         '''
+        self.roombas = []
+        self.agent = None
 
         # spawn target roombas
         for i in range(cfg.MISSION_NUM_TARGETS):
@@ -81,19 +83,30 @@ class Mission(object):
             rba = self.roombas[i]
             rba.update(delta, elapsed)
 
-            # Perform collision detection
+            # Perform roomba-to-roomba collision detection
             for j in range(len(self.roombas)):
                 if i == j:
                     continue
 
-                if Mission._check_roomba_collision(rba, self.roombas[j]):
-                    if Mission._check_roomba_is_facing(rba, self.roombas[j]):
+                if Environment._check_roomba_collision(rba, self.roombas[j]):
+                    if Environment._check_roomba_is_facing(rba, self.roombas[j].pos):
                         rba.collisions['front'] = True
 
+            # Perform drone-to-roomba collision detection
+            if self.agent.is_touching_roomba_top(rba):
+                rba.collisions['top'] = True
+
+            if self.agent.is_blocking_roomba(rba):
+                if Environment._check_roomba_is_facing(rba, self.agent.pos):
+                    rba.collisions['front'] = True
+
             # Check if the roomba has left the arena
-            # (has_left, side) = Mission._check_bounds(rba)
+            # (has_left, side) = Environment._check_bounds(rba)
             # if has_left:
             #     rba.stop()
+        
+        # update the drone
+        self.agent.update(delta, elapsed)
 
     @staticmethod
     def _check_roomba_collision(ra, rb):
@@ -104,30 +117,21 @@ class Mission(object):
         euclidean distance and comparing that to the radius
         of each roomba.
         '''
-        return pow(ra.pos[0] - rb.pos[0], 2) + pow(ra.pos[1] - rb.pos[1], 2) < (4 * cfg.ROOMBA_RADIUS * cfg.ROOMBA_RADIUS)
+        return geometry.circle_intersects_circle(ra.pos, rb.pos, cfg.ROOMBA_RADIUS)
 
     @staticmethod
-    def _check_roomba_is_facing(ra, rb):
+    def _check_roomba_is_facing(ra, pos):
         '''
-        Returns true if roomba ra is facing roomba rb.
+        Returns true if roomba ra is facing the point pos.
 
         This works by determining the angle of the vector
-        ra -> rb relative to the +x axisd and checking if the 
+        ra -> pos relative to the +x axis and checking if the 
         heading of ra is within pi/2 radians of that result.
         '''
-        ang = np.arctan2(rb.pos[1] - ra.pos[1], rb.pos[0] - ra.pos[0])
-        return Mission._compare_angle(ra.heading, ang) < cfg.PI / 2
+        ang = np.arctan2(pos[1] - ra.pos[1], pos[0] - ra.pos[0])
+        return geometry.compare_angle(ra.heading, ang) < cfg.PI / 2
     
     @staticmethod
-    def _compare_angle(a, b):
-        '''
-        Returns the smallest absolute difference between the 
-        two angles in radians.
-
-        a, b - two angles to compare in radians
-        '''
-        return abs((((a - b) + cfg.PI) % cfg.TAU) - cfg.PI)
-    
     def _check_bounds(r):
         '''
         Check if a roomba has left the arena.
