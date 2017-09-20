@@ -10,7 +10,6 @@ import pyglet
 from roombasim.graphics.display import Display
 import roombasim.config as cfg
 from roombasim.environment import Environment
-from roombasim.vehicle.pittrasdrone import PittRASDrone
 
 def main():
     parser = argparse.ArgumentParser()
@@ -45,12 +44,16 @@ def run_demo(args):
     if args.obstacle_spawn_radius != None:
         cfg.MISSION_OBSTACLE_SPAWN_RADIUS = args.obstacle_spawn_radius
 
+
+    import roombasim.pittras.config
+    cfg.load(roombasim.pittras.config)
+
     # setup mission
     e = Environment()
     e.reset()
 
-    # setup vehicle
-    d = PittRASDrone([13,10], 0)
+    # setup agent
+    d = cfg.AGENT([13,10], 0)
     e.agent = d
 
     config = pyglet.gl.Config(sample_buffers=1, samples=4)

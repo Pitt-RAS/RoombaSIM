@@ -6,7 +6,7 @@ Robotic Automation Society.
 '''
 import numpy as np
 
-from roombasim.vehicle.drone import Drone
+from roombasim.agent.drone import Drone
 import roombasim.config as cfg
 from roombasim import geometry
 
