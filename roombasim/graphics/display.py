@@ -19,7 +19,8 @@ import time
 
 import roombasim.config as cfg
 
-from roombasim import roomba
+from roombasim import roomba, geometry
+from roombasim.vehicle.pittrasdrone import PittRASDrone
 
 class Display(pyglet.window.Window):
 
@@ -41,6 +42,9 @@ class Display(pyglet.window.Window):
         glLoadIdentity()
         glOrtho(0, 20, 0, 20, -1, 1)
 
+        # glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable( GL_BLEND );
+
     def on_draw(self):
         pyglet.clock.tick()
         glClear(GL_COLOR_BUFFER_BIT)
@@ -53,6 +57,8 @@ class Display(pyglet.window.Window):
             else:
                 Display._draw_obstacle_roomba(r)
 
+        Display._draw_drone(self.mission.agent)
+
     @staticmethod
     def _draw_target_roomba(r):
         pos = r.pos
@@ -62,7 +68,7 @@ class Display(pyglet.window.Window):
 
         glEnable(GL_BLEND)
         glEnable(GL_LINE_SMOOTH)
-        glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+        glHint(GL_LINE_SMOOTH_HINT,GL_NICEST)
 
         # Outline
         if r.state == cfg.ROOMBA_STATE_FORWARD or True:
@@ -70,16 +76,7 @@ class Display(pyglet.window.Window):
         elif r.state == cfg.ROOMBA_STATE_TURNING:
             glColor3f(1,0.8,0.8)
 
-        glBegin(GL_LINE_LOOP)
-
-        for i in range(vertex_count):
-            theta = (2 * np.pi * i) / vertex_count
-            glVertex2f(
-                (np.cos(theta) * radius + pos[0]), 
-                (np.sin(theta) * radius + pos[1])
-            )
-
-        glEnd()
+        Display._draw_hollow_circle(pos, radius)
 
         # Direction indicator
         glBegin(GL_LINES)
@@ -98,7 +95,7 @@ class Display(pyglet.window.Window):
 
         glEnable(GL_BLEND)
         glEnable(GL_LINE_SMOOTH)
-        glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+        glHint(GL_LINE_SMOOTH_HINT,GL_NICEST)
 
         # Outline
         if r.state == cfg.ROOMBA_STATE_FORWARD or True:
@@ -106,16 +103,7 @@ class Display(pyglet.window.Window):
         elif r.state == cfg.ROOMBA_STATE_TURNING:
             glColor3f(1,0.8,0.8)
 
-        glBegin(GL_LINE_LOOP)
-
-        for i in range(vertex_count):
-            theta = (2 * np.pi * i) / vertex_count
-            glVertex2f(
-                (np.cos(theta) * radius + pos[0]), 
-                (np.sin(theta) * radius + pos[1])
-            )
-
-        glEnd()
+        Display._draw_hollow_circle(pos, radius)
 
         # Direction indicator
         glBegin(GL_LINES)
@@ -125,6 +113,52 @@ class Display(pyglet.window.Window):
 
         glEnd()
     
+    @staticmethod
+    def _draw_drone(drone):
+        if isinstance(drone, PittRASDrone):
+            Display._draw_pittras_drone(drone)
+        else:
+            raise NotImplementedError
+
+    @staticmethod
+    def _draw_pittras_drone(drone):
+        glEnable(GL_BLEND)
+        glEnable(GL_LINE_SMOOTH)
+        glHint(GL_LINE_SMOOTH_HINT,GL_NICEST)
+
+        # altitude indicator
+        # alpha is 1 when landed and 0 when >= 2 meters
+        alpha = max(min(((-0.5 * drone.altitude) + 1), 1), 0)
+        glColor4f(0.5,0.5,0.5,alpha)
+
+        scale = ((1 - alpha) * 3) + 1
+        Display._draw_hollow_square(drone.pos, drone.heading, cfg.PITTRAS_DRONE_BASE_DIAGONAL * scale)
+
+        # draw bumpers
+        if drone.altitude <= cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT:
+            glColor3f(1,0.5,0.5)
+        else:
+            glColor3f(1,1,1)
+        Display._draw_hollow_square(drone.pos, drone.heading, cfg.PITTRAS_DRONE_BASE_DIAGONAL)
+
+        # draw prop guards
+        glColor3f(0.8,0.8,0.5)
+        for c in geometry.get_square_corners(drone.pos, drone.heading, cfg.PITTRAS_DRONE_BASE_WIDTH):
+            Display._draw_hollow_circle(c, cfg.PITTRAS_DRONE_PROP_RADIUS)
+
+        # Direction indicator
+        glColor3f(1,1,1)
+        glBegin(GL_LINES)
+
+        glVertex2f(drone.pos[0], drone.pos[1])
+        glVertex2f(
+            np.cos(drone.heading) * (cfg.PITTRAS_DRONE_BASE_WIDTH / 2) + drone.pos[0], 
+            np.sin(drone.heading) * (cfg.PITTRAS_DRONE_BASE_WIDTH / 2) + drone.pos[1]
+        )
+
+        glEnd()
+
+
     @staticmethod
     def _draw_gridlines():
 
@@ -152,3 +186,40 @@ class Display(pyglet.window.Window):
             glVertex2f(x,20)
             glEnd()
 
+    @staticmethod
+    def _draw_hollow_circle(pos, radius):
+        glBegin(GL_LINE_LOOP)
+
+        for i in range(cfg.GRAPHICS_CIRCLE_VERTICES):
+            theta = (2 * np.pi * i) / cfg.GRAPHICS_CIRCLE_VERTICES
+            glVertex2f(
+                (np.cos(theta) * radius + pos[0]), 
+                (np.sin(theta) * radius + pos[1])
+            )
+
+        glEnd()
+
+    @staticmethod
+    def _draw_hollow_square(pos, heading, diagonal):
+        glBegin(GL_LINE_LOOP)
+        # front right
+        glVertex2f(
+            pos[0] + (np.cos(heading - (cfg.PI / 4)) * diagonal),
+            pos[1] + (np.sin(heading - (cfg.PI / 4)) * diagonal)
+        )
+        # back right
+        glVertex2f(
+            pos[0] + (np.cos(heading - (3 * cfg.PI / 4)) * diagonal),
+            pos[1] + (np.sin(heading - (3 * cfg.PI / 4)) * diagonal)
+        )
+        # back left
+        glVertex2f(
+            pos[0] + (np.cos(heading + (3 * cfg.PI / 4)) * diagonal),
+            pos[1] + (np.sin(heading + (3 * cfg.PI / 4)) * diagonal)
+        )
+        # front left
+        glVertex2f(
+            pos[0] + (np.cos(heading + (cfg.PI / 4)) * diagonal),
+            pos[1] + (np.sin(heading + (cfg.PI / 4)) * diagonal)
+        )
+        glEnd()

@@ -4,12 +4,13 @@ roombasim.py
 CLI interface for various functions.
 '''
 
-import pyglet
 import argparse
+import pyglet
 
-from roombasim.display import Display
+from roombasim.graphics.display import Display
 import roombasim.config as cfg
-from roombasim.mission import Mission
+from roombasim.environment import Environment
+from roombasim.vehicle.pittrasdrone import PittRASDrone
 
 def main():
     parser = argparse.ArgumentParser()
@@ -45,11 +46,15 @@ def run_demo(args):
         cfg.MISSION_OBSTACLE_SPAWN_RADIUS = args.obstacle_spawn_radius
 
     # setup mission
-    m = Mission()
-    m.setup()
+    e = Environment()
+    e.reset()
+
+    # setup vehicle
+    d = PittRASDrone([13,10], 0)
+    e.agent = d
 
     config = pyglet.gl.Config(sample_buffers=1, samples=4)
-    window = Display(m)
+    window = Display(e)
 
     pyglet.app.run()
 
