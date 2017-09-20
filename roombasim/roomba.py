@@ -26,16 +26,18 @@ class Roomba(object):
     (No update function)
     '''
 
-    def __init__(self, pos, heading):
+    def __init__(self, pos, heading, tag=''):
         '''
         Initialize a roomba object with a given position and heading.
         By default, the roomba starts in STATE_IDLE.
 
         pos - [x,y] in meters
         heading - angle in radians (0 is +x and pi/2 is +y)
+        [tag] - an optional identification element
         '''
-        self.heading = heading
         self.pos = pos
+        self.heading = heading
+        self.tag = tag
 
         self.collisions = {
             'front': False,

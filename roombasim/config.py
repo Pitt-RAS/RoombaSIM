@@ -4,7 +4,39 @@ config.py
 Contains a bunch of modifiable constants organized by
 module type.
 '''
+import re
 import numpy as np
+
+_const_rgx = re.compile('(([A-Z_][A-Z0-9_]*)|(__.*__))$')
+
+def load(module):
+    '''
+    Copies all module-level constants from `module`
+    into this module.
+
+    Identifiers must match _const_rgx and can't start
+    with '_' in order to be copied.
+    '''
+    # slightly hacky
+    g = globals()
+    for attr in dir(module):
+        if not attr.startswith('_') and _const_rgx.match(attr):
+            g[attr] = getattr(module, attr)
+
+
+#
+# IMPLEMENTATION SPECIFIC CONSTANTS
+# define these in a separate file and use cfg.load(module)
+#
+
+# Should point to a subclass of agent.drone
+# Defines the agent to initialize in the environment
+AGENT = None
+
+# (optional)
+# Defines a method to render the agent in the opengl
+# context. See roombasim.graphics.display for examples.
+RENDER_AGENT = None
 
 #
 # MATH CONSTANTS
@@ -56,26 +88,6 @@ MISSION_NUM_OBSTACLES = 4
 
 # radius to spawn obstacle roombas in meters
 MISSION_OBSTACLE_SPAWN_RADIUS = 4
-
-#
-# PITTRAS DRONE CONFIGURATION
-#
-
-# the width of the square bumper base in meters
-PITTRAS_DRONE_BASE_WIDTH = 0.57
-
-# the distance from the center to a corner in meters
-PITTRAS_DRONE_BASE_DIAGONAL = (PITTRAS_DRONE_BASE_WIDTH / 2) * np.sqrt(2)
-
-# the radius of the roomba bumper pad im meters
-PITTRAS_DRONE_PAD_RADIUS = 0.175
-
-# altitude of the drone that will cause contact
-# with the roombas
-PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT = 0.03
-
-# radius of outer edge of prop guards in meters
-PITTRAS_DRONE_PROP_RADIUS = 0.155
 
 #
 # GRAPHICS CONFIGURATION
