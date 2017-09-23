@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 roombasim.py
 
@@ -5,6 +6,7 @@ CLI interface for various functions.
 '''
 
 import argparse
+import time
 import pyglet
 
 from roombasim.graphics.display import Display
@@ -16,16 +18,20 @@ def main():
     subparsers = parser.add_subparsers(dest='command')
 
     demo_parser = subparsers.add_parser('demo')
-
     demo_parser.add_argument('-num_targets', type=int, choices=range(1,25))
     demo_parser.add_argument('-num_obstacles', type=int, choices=range(1,11))
     demo_parser.add_argument('-target_spawn_radius', type=float)
     demo_parser.add_argument('-obstacle_spawn_radius', type=float)
 
+    speedtest_parser = subparsers.add_parser('speedtest')
+    speedtest_parser.add_argument('-frames', type=int, default=1000)
+
     args = parser.parse_args()
 
     if args.command == 'demo':
         run_demo(args)
+    elif args.command == 'speedtest':
+        speed_test(args)
 
 
 def run_demo(args):
@@ -61,6 +67,37 @@ def run_demo(args):
 
     pyglet.app.run()
 
+
+def speed_test(args):
+    import roombasim.pittras.config
+    cfg.load(roombasim.pittras.config)
+
+    n = args.frames
+
+    print 'Starting speed test [{} frames]'.format(n)
+
+    e = Environment()
+    e.reset()
+
+    d = cfg.AGENT([13,10], 0)
+    e.agent = d
+
+    start = time.time()
+
+    i = 0
+    el = 0
+    while i < n:
+        el += 1/60.
+        e.update(1/60., el)
+        i += 1
+
+    end = time.time()
+
+    dur = end - start
+    mul = n / dur
+
+    print 'Processing {} frames took {} seconds'.format(n, dur)
+    print 'Speed of {} fps'.format(mul)
 
 if __name__ == '__main__':
     main()

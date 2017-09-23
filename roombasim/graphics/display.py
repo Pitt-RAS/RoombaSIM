@@ -23,11 +23,12 @@ from roombasim import roomba, geometry
 
 class Display(pyglet.window.Window):
 
-    def __init__(self, mission):
+    def __init__(self, mission, self_update=True):
         super(Display, self).__init__(700,700)
 
-        pyglet.clock.schedule_interval(self._update, 1.0/60.0)
-        pyglet.clock.set_fps_limit(60)
+        if self_update:
+            pyglet.clock.schedule_interval(self._update, 1.0/60.0)
+            pyglet.clock.set_fps_limit(60)
 
         self.mission = mission
         self.start_time = time.time()
