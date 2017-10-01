@@ -38,10 +38,6 @@ AGENT = None
 # context. See roombasim.graphics.display for examples.
 RENDER_AGENT = None
 
-# contains a reference to the displaying window
-# if one exists
-_WINDOW = None
-
 #
 # MATH CONSTANTS
 #

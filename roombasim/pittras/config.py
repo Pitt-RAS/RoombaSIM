@@ -11,13 +11,9 @@ AGENT = PittRASDrone
 
 CONTROLLER = PittController
 
-TASKS = {
-    'xyztranslate' : None
-}
+TASKS = {}
 
-STATES = {
-    
-}
+STATES = {}
 
 RENDER_AGENT = render.render_pittrasdrone
 
