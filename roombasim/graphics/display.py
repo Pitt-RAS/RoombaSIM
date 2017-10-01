@@ -19,22 +19,28 @@ import time
 
 import roombasim.config as cfg
 
-from roombasim import roomba, geometry
+from roombasim.environment import roomba
+from roombasim import geometry
 
 class Display(pyglet.window.Window):
 
-    def __init__(self, mission, self_update=True):
+    def __init__(self, environment, self_update=True):
         super(Display, self).__init__(700,700)
+
+        self.update_func = (lambda a,b:0)
 
         if self_update:
             pyglet.clock.schedule_interval(self._update, 1.0/60.0)
             pyglet.clock.set_fps_limit(60)
 
-        self.mission = mission
+        self.environment = environment
         self.start_time = time.time()
 
+    def set_update_func(self, update_func):
+        self.update_func = update_func
+
     def _update(self, dt):
-        self.mission.update(dt, (time.time() - self.start_time) * 1000)
+        self.update_func(dt, (time.time() - self.start_time) * 1000)
 
     def on_resize(self, width, height):
         glViewport(10, 10, width-20, height-20)
@@ -51,13 +57,13 @@ class Display(pyglet.window.Window):
 
         Display._draw_gridlines()
 
-        for r in self.mission.roombas:
+        for r in self.environment.roombas:
             if isinstance(r, roomba.TargetRoomba):
                 Display._draw_target_roomba(r)
             else:
                 Display._draw_obstacle_roomba(r)
 
-        Display._draw_drone(self.mission.agent)
+        Display._draw_drone(self.environment.agent)
 
     @staticmethod
     def _draw_target_roomba(r):

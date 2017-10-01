@@ -1,13 +1,23 @@
 
-import pittrasdrone
-import render
+from roombasim.pittras import PittRASDrone, render
+from roombasim.pittras.ai import PittController
 
 import numpy as np
 
 #
 # IMPLEMENTATION SPECIFIC CONSTANTS
 #
-AGENT = pittrasdrone.PittRASDrone
+AGENT = PittRASDrone
+
+CONTROLLER = PittController
+
+TASKS = {
+    'xyztranslate' : None
+}
+
+STATES = {
+    
+}
 
 RENDER_AGENT = render.render_pittrasdrone
 
