@@ -112,4 +112,3 @@ def circle_intersects_line(circle, radius, p0, p1):
     dist = np.linalg.norm(proj_point - np.array(circle))
 
     return dist < radius
-

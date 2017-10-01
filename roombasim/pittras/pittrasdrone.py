@@ -13,22 +13,22 @@ from roombasim import geometry
 class PittRASDrone(Drone):
 
     def update(self, delta, elapsed):
-        self.altitude = np.sin(elapsed / 1000) + 1
-        
+        # self.z_pos = np.sin(elapsed / 1000) + 1
+        super(PittRASDrone, self).update(delta, elapsed)
 
     def is_touching_roomba_top(self, rba):
         '''
         PittRAS drone pad has a diameter of 35cm.
         '''
-        dist2 = pow((self.pos[0] - rba.pos[0]), 2) * pow((self.pos[1] - rba.pos[1]), 2)
+        dist2 = pow((self.xy_pos[0] - rba.pos[0]), 2) * pow((self.xy_pos[1] - rba.pos[1]), 2)
         dist = np.sqrt(dist2)
 
-        return self.altitude < cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT and dist < cfg.PITTRAS_DRONE_PAD_RADIUS
+        return self.z_pos < cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT and dist < cfg.PITTRAS_DRONE_PAD_RADIUS
 
     def is_blocking_roomba(self, rba):
         '''
         PittRAS drone has a square base of width: 57cm
         '''
-        hit_bumper = geometry.circle_intersects_square(rba.pos, cfg.ROOMBA_RADIUS, self.pos, self.heading, cfg.PITTRAS_DRONE_BASE_WIDTH)
+        hit_bumper = geometry.circle_intersects_square(rba.pos, cfg.ROOMBA_RADIUS, self.xy_pos, self.yaw, cfg.PITTRAS_DRONE_BASE_WIDTH)
         
-        return hit_bumper and self.altitude < cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT
+        return hit_bumper and self.z_pos < cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT

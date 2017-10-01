@@ -13,32 +13,56 @@ def render_pittrasdrone(drone):
 
     # altitude indicator
     # alpha is 1 when landed and 0 when >= 2 meters
-    alpha = max(min(((-0.5 * drone.altitude) + 1), 1), 0)
+    alpha = max(min(((-0.5 * drone.z_pos) + 1), 1), 0)
     glColor4f(0.5,0.5,0.5,alpha)
 
     scale = ((1 - alpha) * 3) + 1
-    Display._draw_hollow_square(drone.pos, drone.heading, cfg.PITTRAS_DRONE_BASE_DIAGONAL * scale)
+    Display._draw_hollow_square(drone.xy_pos, drone.yaw, cfg.PITTRAS_DRONE_BASE_DIAGONAL * scale)
 
     # draw bumpers
-    if drone.altitude <= cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT:
+    if drone.z_pos <= cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT:
         glColor3f(1,0.5,0.5)
     else:
         glColor3f(1,1,1)
-    Display._draw_hollow_square(drone.pos, drone.heading, cfg.PITTRAS_DRONE_BASE_DIAGONAL)
+    Display._draw_hollow_square(drone.xy_pos, drone.yaw, cfg.PITTRAS_DRONE_BASE_DIAGONAL)
 
     # draw prop guards
     glColor3f(0.8,0.8,0.5)
-    for c in geometry.get_square_corners(drone.pos, drone.heading, cfg.PITTRAS_DRONE_BASE_WIDTH):
+    for c in geometry.get_square_corners(drone.xy_pos, drone.yaw, cfg.PITTRAS_DRONE_BASE_WIDTH):
         Display._draw_hollow_circle(c, cfg.PITTRAS_DRONE_PROP_RADIUS)
 
     # Direction indicator
     glColor3f(1,1,1)
     glBegin(GL_LINES)
 
-    glVertex2f(drone.pos[0], drone.pos[1])
+    glVertex2f(drone.xy_pos[0], drone.xy_pos[1])
     glVertex2f(
-        np.cos(drone.heading) * (cfg.PITTRAS_DRONE_BASE_WIDTH / 2) + drone.pos[0], 
-        np.sin(drone.heading) * (cfg.PITTRAS_DRONE_BASE_WIDTH / 2) + drone.pos[1]
+        np.cos(drone.yaw) * (cfg.PITTRAS_DRONE_BASE_WIDTH / 2) + drone.xy_pos[0], 
+        np.sin(drone.yaw) * (cfg.PITTRAS_DRONE_BASE_WIDTH / 2) + drone.xy_pos[1]
+    )
+
+    glEnd()
+
+    # 2d velocity indicator
+    glColor3f(0.5,1,0.5)
+    glBegin(GL_LINES)
+
+    glVertex2f(drone.xy_pos[0], drone.xy_pos[1])
+    glVertex2f(
+        drone.xy_pos[0] + drone.xy_vel[0], 
+        drone.xy_pos[1] + drone.xy_vel[1]
+    )
+
+    glEnd()
+
+    # 2d acceleration indicator
+    glColor3f(0.5,0.5,1)
+    glBegin(GL_LINES)
+
+    glVertex2f(drone.xy_pos[0], drone.xy_pos[1])
+    glVertex2f(
+        drone.xy_pos[0] + drone._frame_accel[0], 
+        drone.xy_pos[1] + drone._frame_accel[1]
     )
 
     glEnd()

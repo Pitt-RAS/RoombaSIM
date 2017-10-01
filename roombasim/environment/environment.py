@@ -13,7 +13,8 @@ the collision dict.
 import numpy as np
 
 import roombasim.config as cfg
-from roombasim import roomba, geometry
+from roombasim.environment import roomba
+from roombasim import geometry
 
 class Environment(object):
     '''
@@ -97,7 +98,7 @@ class Environment(object):
                 rba.collisions['top'] = True
 
             if self.agent.is_blocking_roomba(rba):
-                if Environment._check_roomba_is_facing(rba, self.agent.pos):
+                if Environment._check_roomba_is_facing(rba, self.agent.xy_pos):
                     rba.collisions['front'] = True
 
             # Check if the roomba has left the arena
@@ -143,3 +144,4 @@ class Environment(object):
             0 otherwise
         '''
         pass
+        
