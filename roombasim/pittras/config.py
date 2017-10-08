@@ -1,6 +1,8 @@
 
 from roombasim.pittras import PittRASDrone, render
 from roombasim.pittras.ai import PittController
+from roombasim.pittras.state import *
+from roombasim.pittras.task import *
 
 import numpy as np
 
@@ -11,9 +13,13 @@ AGENT = PittRASDrone
 
 CONTROLLER = PittController
 
-TASKS = {}
+TASKS = {
+    'XYZTranslateTask': XYZTranslateTask
+}
 
-STATES = {}
+STATES = {
+    'DroneState': DroneState
+}
 
 RENDER_AGENT = render.render_pittrasdrone
 

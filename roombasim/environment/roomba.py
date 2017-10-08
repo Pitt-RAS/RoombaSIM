@@ -90,6 +90,14 @@ class TargetRoomba(Roomba):
         elapsed - total time elapsed since start (milliseconds)
         '''
         # check for collisions
+        if self.collisions['top']:
+            self.collisions['top'] = False
+
+            if self.state == cfg.ROOMBA_STATE_FORWARD:
+                self.state = cfg.ROOMBA_STATE_TURNING
+                self.turn_target = (np.pi / 4)
+                self.turn_clockwise = True
+
         if self.collisions['front']:
             self.collisions['front'] = False
 

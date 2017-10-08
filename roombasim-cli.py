@@ -26,6 +26,8 @@ def main():
     speedtest_parser = subparsers.add_parser('speedtest')
     speedtest_parser.add_argument('-frames', type=int, default=1000)
 
+    aidemo_parser = subparsers.add_parser('aidemo')
+
     keydemo_parser = subparsers.add_parser('keydemo')
 
     args = parser.parse_args()
@@ -34,6 +36,8 @@ def main():
         run_demo(args)
     elif args.command == 'speedtest':
         speed_test(args)
+    elif args.command == 'aidemo':
+        ai_demo(args)
     elif args.command == 'keydemo':
         keyboard_demo(args)
 
@@ -42,11 +46,30 @@ def ai_demo(args):
     '''
     Test ai task/state systems.
     '''
-
     import roombasim.pittras.config
     cfg.load(roombasim.pittras.config)
 
     controller = cfg.CONTROLLER()
+
+    # setup mission
+    environment = Environment()
+    environment.reset()
+
+    # setup agent
+    agent = cfg.AGENT([1.5,1.5], 0)
+    environment.agent = agent
+
+    # create window so the keyboard can access it
+    window = Display(environment)
+
+    def update_func(delta, elapsed):
+        environment.update(delta, elapsed)
+        controller.frame_update(delta, elapsed, environment)
+
+    window.set_update_func(update_func)
+    config = pyglet.gl.Config(sample_buffers=1, samples=4)
+
+    pyglet.app.run()
 
 
 def run_demo(args):
