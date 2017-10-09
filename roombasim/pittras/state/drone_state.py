@@ -1,7 +1,23 @@
+'''
+drone_state.py
 
+Contains the DroneState odometry sensor.
+'''
 from roombasim.ai import State
 
 class DroneState(State):
+    '''
+    Drone odometry
+
+    {
+        'xy_pos': float[2]
+        'xy_vel': float[2]
+        'z_pos': float
+        'z_vel': float
+        'yaw': float
+        'yaw_vel': float
+    }
+    '''
 
     @staticmethod
     def query(environment):

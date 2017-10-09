@@ -1,19 +1,27 @@
-
+'''
+xyz_translation_task.py
+'''
 import numpy as np
 
 from roombasim.ai import Task
 
-class XYZTranslateTask(Task):
+class XYZTranslationTask(Task):
+    '''
+    A task to move the drone to an absolute position somewhere
+    in the arena. The task accepts a single 3d vector that defines
+    the target position as an [x,y,z] coordinate. Two PID controllers 
+    are used: one for the xy-plane and one for the z-axis, in order 
+    to control the drone's position.
+    '''
     
     def __init__(self, target):
         '''
         target - 3d (x,y,z) vector
-        yaw - target yaw angle
         '''
         self.target_xy = np.array(target[:2])
         self.target_z = target[2]
 
-        # simple PID controller
+        # PID controller contstants
         self.k_xy = np.array([0.5,1.1,0])
         self.k_z = np.array([0.5,1.1,0])
 
@@ -21,6 +29,7 @@ class XYZTranslateTask(Task):
         self.i_z = 0
 
     def update(self, delta, elapsed, state_controller, environment):
+        # fetch current odometry
         drone_state = state_controller.query('DroneState', environment)
 
         # xy PID controller
@@ -29,7 +38,8 @@ class XYZTranslateTask(Task):
         self.i_xy += p_xy * delta
         control_xy = self.k_xy.dot([p_xy, d_xy, self.i_xy])
 
-        # rotate the control xy vector about the origin
+        # rotate the control xy vector counterclockwise about
+        # the origin by the current yaw
         yaw = -drone_state['yaw']
         rot_matrix = np.array([
             [np.cos(yaw), -np.sin(yaw)],
@@ -43,5 +53,5 @@ class XYZTranslateTask(Task):
         self.i_z += p_z * delta
         control_z = self.k_z.dot([p_z, d_z, self.i_z])
 
+        # perform control action
         environment.agent.control(adjusted_xy, 0, control_z)
-
