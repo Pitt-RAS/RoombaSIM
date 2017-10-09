@@ -176,7 +176,7 @@ def speed_test(args):
 
     n = args.frames
 
-    print 'Starting speed test [{} frames]'.format(n)
+    print('Starting speed test [{} frames]'.format(n))
 
     e = Environment()
     e.reset()
@@ -198,10 +198,10 @@ def speed_test(args):
     dur = end - start
     mul = n / dur
 
-    print 'Processing {} frames took {} seconds'.format(n, dur)
-    print 'Speed of {} fps'.format(mul)
+    print('Processing {} frames took {} seconds'.format(n, dur))
+    print('Speed of {} fps'.format(mul))
 
 
 if __name__ == '__main__':
     main()
-    
+
