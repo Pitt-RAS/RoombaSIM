@@ -14,7 +14,7 @@ AGENT = PittRASDrone
 CONTROLLER = WaypointDemoController
 
 TASKS = {
-    'XYZTranslationTask': XYZTranslationTask
+    'XYZTranslationTask': XYZTranslationTask,
     'TakeoffTask': TakeoffTask
 }
 
