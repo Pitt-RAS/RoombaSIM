@@ -13,9 +13,14 @@ import roombasim.config as cfg
 from roombasim.graphics import Display
 from roombasim.environment import Environment
 
+
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='command')
+
+    controller_parser = subparsers.add_parser('run')
+    controller_parser.add_argument('config')
+    controller_parser.add_argument('controller')
 
     demo_parser = subparsers.add_parser('demo')
     demo_parser.add_argument('-num_targets', type=int, choices=range(1,25))
@@ -30,7 +35,9 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == 'demo':
+    if args.command == 'run':
+        run_controller(args)
+    elif args.command == 'demo':
         run_demo(args)
     elif args.command == 'speedtest':
         speed_test(args)
@@ -38,15 +45,60 @@ def main():
         keyboard_demo(args)
 
 
-def ai_demo(args):
+def _load_class(cpath):
     '''
-    Test ai task/state systems.
+    Attempts to load a class given the module path.
+    Returns the class reference or None if it was not found.
     '''
+    try:
+        attr = cpath.split('.')
+        mod = __import__('.'.join(attr[:-1]))
+        for a in attr[1:]:
+            mod = getattr(mod, a)
+        return mod
+    except Exception:
+        return None
 
-    import roombasim.pittras.config
-    cfg.load(roombasim.pittras.config)
 
-    controller = cfg.CONTROLLER()
+def run_controller(args):
+    config = _load_class(args.config)
+
+    if (config is None):
+        print("Couldn't load config path: " + str(args.config))
+        return
+    else:
+        cfg.load(config)
+
+    controller_p = _load_class(args.controller)
+
+    if (controller_p is None):
+        print("Couldn't load class: " + str(args.controller))
+        return
+    else:
+        print("Loaded Controller: " + str(controller_p))
+    
+    # initialize controller
+    controller = controller_p()
+
+    # setup mission
+    environment = Environment()
+    environment.reset()
+
+    # setup agent
+    agent = cfg.AGENT([1.5,1.5], 0)
+    environment.agent = agent
+
+    # create window so the keyboard can access it
+    window = Display(environment)
+
+    def update_func(delta, elapsed):
+        environment.update(delta, elapsed)
+        controller.frame_update(delta, elapsed, environment)
+
+    window.set_update_func(update_func)
+    config = pyglet.gl.Config(sample_buffers=1, samples=4)
+
+    pyglet.app.run()
 
 
 def run_demo(args):
@@ -117,13 +169,14 @@ def keyboard_demo(args):
 
     pyglet.app.run()
 
+
 def speed_test(args):
     import roombasim.pittras.config
     cfg.load(roombasim.pittras.config)
 
     n = args.frames
 
-    print 'Starting speed test [{} frames]'.format(n)
+    print('Starting speed test [{} frames]'.format(n))
 
     e = Environment()
     e.reset()
@@ -145,9 +198,10 @@ def speed_test(args):
     dur = end - start
     mul = n / dur
 
-    print 'Processing {} frames took {} seconds'.format(n, dur)
-    print 'Speed of {} fps'.format(mul)
+    print('Processing {} frames took {} seconds'.format(n, dur))
+    print('Speed of {} fps'.format(mul))
+
 
 if __name__ == '__main__':
     main()
-    
+

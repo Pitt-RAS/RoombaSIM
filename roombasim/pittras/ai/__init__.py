@@ -2,4 +2,4 @@
 PittRAS AI
 '''
 
-from .pitt_controller import PittController
+from .waypoint_demo_controller import WaypointDemoController

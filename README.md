@@ -42,11 +42,27 @@ The following diagram shows the general flow of information through the system:
 
 ![overview](overview.svg)
 
+# Running
+
+You can run a specific controller with the command line interface:
+
+```bash
+$ ./roombasim-cli.py run [config] [controller]
+```
+
+For instance, to load the `roombasim.pittras` configuration and run the `WaypointDemoController`, you can use the following command:
+
+```bash
+$ ./roombasim-cli.py run roombasim.pittras.config roombasim.pittras.ai.WaypointDemoController
+```
+
+This command will use default settings and create a window to preview the controller in real time.
+
 # Demo
 
-## Running the demo
+There are also a few demo controllers that can be run using different commands.
 
-You can run a simple roomba movement demo using the CLI:
+## Roomba demo:
 
 ```bash
 $ ./roombasim-cli.py demo {params}
@@ -68,9 +84,11 @@ $ ./roombasim-cli.py demo
 $ ./roombasim-cli.py demo -num_targets=4 -num_obstacles=2 -target_spawn_radius=0.5 -obstacle_spawn_radius=2
 ```
 
-## Running the keyboard demo
+## Keyboard demo:
 
 To experiment with drone movement and controls, you can run the keyboard demo which simulates manual control in a form of attitude mode.
+
+*(This is really hard to control)*
 
 ```bash
 $ ./roombasim-cli.py keydemo
