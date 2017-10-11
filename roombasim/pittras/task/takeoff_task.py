@@ -18,13 +18,6 @@ class TakeoffTaskState:
 class TakeoffTask(Task):
 
     def __init__(self):
-        # import constants
-        self._TAKEOFF_VELOCITY = cfg.PITTRAS_TAKEOFF_VELOCITY
-        self._TAKEOFF_COMPLETE_HEIGHT = cfg.PITTRAS_TAKEOFF_COMPLETE_HEIGHT
-        self._ANGLE_MODE_HEIGHT = cfg.PITTRAS_TAKEOFF_ANGLE_MODE_HEIGHT
-        self._DELAY_BEFORE_TAKEOFF = cfg.PITTRAS_DELAY_BEFORE_TAKEOFF
-        self._TRANSFORM_TIMEOUT = cfg.PITTRAS_TAKEOFF_TRANSFORM_TIMEOUT
-
         # null velocities
         self.zero_xy_vel = np.array([0,0], dtype=np.float64)
 
@@ -38,9 +31,9 @@ class TakeoffTask(Task):
         control_z_vel = drone_state['z_vel']
 
         # Pause before ramping up the motors
-        if elapsed > self._DELAY_BEFORE_TAKEOFF * 1000:
+        if elapsed > cfg.PITTRAS_DELAY_BEFORE_TAKEOFF * 1000:
             # Check if we reached the target height
-            if height < self._TAKEOFF_COMPLETE_HEIGHT:
+            if height < cfg.PITTRAS_TAKEOFF_COMPLETE_HEIGHT:
                 # Ascend if below the target height
                 self._state = TakeoffTaskState.ascend
 
@@ -51,5 +44,4 @@ class TakeoffTask(Task):
 
                 control_z_vel = 0
 
-        print("delta: " + str(delta) + ", elapsed: " + str(elapsed) + ", control_z: " + str(control_z))
         environment.agent.control(self.zero_xy_vel, 0, control_z_vel)
