@@ -15,6 +15,7 @@ CONTROLLER = WaypointDemoController
 
 TASKS = {
     'XYZTranslationTask': XYZTranslationTask
+    'TakeoffTask': TakeoffTask
 }
 
 STATES = {
@@ -42,3 +43,19 @@ PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT = 0.03
 
 # radius of outer edge of prop guards in meters
 PITTRAS_DRONE_PROP_RADIUS = 0.155
+
+# velocity with which to take off with
+PITTRAS_TAKEOFF_VELOCITY = 0.3
+
+# height at which to consider takeoff finished in meters
+# should be higher than min_maneuver_height
+PITTRAS_TAKEOFF_COMPLETE_HEIGHT = 0.7
+
+# delay between arming and taking off
+PITTRAS_DELAY_BEFORE_TAKEOFF = 2.0
+
+# altitude when we transition from acro to angle mode
+PITTRAS_TAKEOFF_ANGLE_MODE_HEIGHT = 0.2
+
+# timeout for transforms
+PITTRAS_TAKEOFF_TRANSFORM_TIMEOUT = 0.2
