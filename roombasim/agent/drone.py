@@ -65,10 +65,6 @@ class Drone(object):
         # rad/s
         self.yaw_vel = 0
 
-        # angular acceleration
-        # rad/s^2
-        self.yaw_accel = 0
-
         # distance from the ground
         # (when landed, this should be zero)
         # m
@@ -78,33 +74,27 @@ class Drone(object):
         # m/s
         self.z_vel = 0
 
-        # z axis acceleration
-        # m/s^2
-        self.z_accel = 0
-
-    def control(self, xy_accel, yaw_accel, z_accel):
+    def control(self, xy_accel, yaw_vel, z_vel):
         '''
         Update drone target parameters:
 
         - xy_accel : a 2d array containing target x and y acceleration values
-        - yaw_accel : a value containing the target yaw acceleration
-        - z_accel : a value containing the target z acceleration
+        - yaw_vel : a value containing the target yaw angular velocity
+        - z_vel : a value containing the target z velocity
         '''
         self.xy_accel = np.array(xy_accel, dtype=np.float64)
-        self.yaw_accel = yaw_accel
-        self.z_accel = z_accel
+        self.yaw_vel = yaw_vel
+        self.z_vel = z_vel
 
     def update(self, delta, elapsed):
         '''
         Perform a physics update step.
         '''
         # update yaw
-        self.yaw_vel += self.yaw_accel * delta
         self.yaw += self.yaw_vel * delta
         self.yaw %= (np.pi * 2)
 
         # update height
-        self.z_vel += self.z_accel * delta
         self.z_pos += self.z_vel * delta
 
         # bounds check
