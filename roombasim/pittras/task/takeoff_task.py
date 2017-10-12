@@ -1,7 +1,7 @@
 
 import numpy as np
 
-import roombasim.config as cfg
+import roombasim.pittras.config as cfg
 
 from roombasim.ai import Task
 
