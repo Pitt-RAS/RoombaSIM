@@ -9,11 +9,11 @@ class XYZTranslationTask(Task):
     '''
     A task to move the drone to an absolute position somewhere
     in the arena. The task accepts a single 3d vector that defines
-    the target position as an [x,y,z] coordinate. Two PID controllers 
-    are used: one for the xy-plane and one for the z-axis, in order 
+    the target position as an [x,y,z] coordinate. Two PID controllers
+    are used: one for the xy-plane and one for the z-axis, in order
     to control the drone's position.
     '''
-    
+
     def __init__(self, target):
         '''
         target - 3d (x,y,z) vector

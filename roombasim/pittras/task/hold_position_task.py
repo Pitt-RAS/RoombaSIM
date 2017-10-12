@@ -13,6 +13,7 @@ class HoldPositionTaskStates:
     init = 0
     holding = 1
     done = 2
+    failed = 3
 
 class HoldPositionTask(Task):
     '''
@@ -25,21 +26,66 @@ class HoldPositionTask(Task):
     def __init__(self, hold_duration):
         self.hold_duration = hold_duration
         self.state = HoldPositionTaskStates.init
+
+        # Hold position properties
         self.start_time = 0
+        self.hold_xy = np.array([0,0])
+        self.hold_z = 0
+
+        # PID controller contstants
+        self.k_xy = np.array([0.5,1.1,0])
+        self.k_z = np.array([0.5,1.1,0])
+
+        self.i_xy = np.array([0,0], dtype=np.float64)
+        self.i_z = 0
 
     def update(self, delta, elapsed, state_controller, environment):
-        if self.done == HoldPosition.done:
+        if self.state == HoldPositionTaskStates.done:
             # TODO(zacyu): Signal the termination of the task when such
             #              capability is added to the framework.
             return
+
+        # Fetch current odometry
+        drone_state = state_controller.query('DroneState', environment)
 
         if self.state == HoldPositionTaskStates.init:
             # TODO(zacyu): Remove this when `elapsed` is changed to represent
             #              the elipsed time since the start of the task.
             self.start_time = elapsed
             self.state = HoldPositionTaskStates.holding
+            self.hold_xy = drone_state['xy_pos']
+            self.hold_z = drone_state['z_pos']
             return
 
         if (self.hold_duration > 0) and (elapsed - self.start_time >
                                          self.hold_duration * 1000):
-            self.state = HoldPositionTaskStates.done
+            if (drone_state['xy_pos'] == self.hold_xy and
+                drone_state['z_pos'] == self.hold_z):
+                self.state = HoldPositionTaskStates.done
+            else:
+                # When the drone fails to return to hold position by the end of
+                # the holding duration.
+                self.state = HoldPositionTaskStates.failed
+
+        # Return to hold position
+        p_xy = (self.hold_xy - drone_state['xy_pos'])
+        d_xy = -drone_state['xy_vel']
+        self.i_xy += p_xy * delta
+        control_xy = self.k_xy.dot([p_xy, d_xy, self.i_xy])
+
+        # Rotate the control xy vector counterclockwise about the origin by the
+        # current yaw
+        yaw = -drone_state['yaw']
+        rot_matrix = np.array([
+            [np.cos(yaw), -np.sin(yaw)],
+            [np.sin(yaw), np.cos(yaw)]
+        ])
+        adjusted_xy = rot_matrix.dot(control_xy)
+
+        p_z = (self.hold_z - drone_state['z_pos'])
+        d_z = -drone_state['z_vel']
+        self.i_z += p_z * delta
+        control_z = self.k_z.dot([p_z, d_z, self.i_z])
+
+        # perform control action
+        environment.agent.control(adjusted_xy, 0, control_z)
