@@ -5,6 +5,5 @@ class TakeoffDemoController(Controller):
 
     def setup(self):
         self.task_controller.switch_task(
-            'TakeoffTask',
-            hold_duration = 5
+            'TakeoffTask'
         )

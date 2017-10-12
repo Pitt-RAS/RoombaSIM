@@ -11,5 +11,6 @@ class TakeoffDemoController(Controller):
 
     def setup(self):
         self.task_controller.switch_task(
-            'HoldPositionTask'
+            'HoldPositionTask',
+            hold_duration = 5
         )
