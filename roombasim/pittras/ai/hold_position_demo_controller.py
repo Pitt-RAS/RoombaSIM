@@ -4,7 +4,7 @@ hold_position_demo_controller.py
 
 from roombasim.ai import Controller
 
-class TakeoffDemoController(Controller):
+class HoldPositionDemoController(Controller):
     '''
     A demo controller tests HoldPositionTask.
     '''
