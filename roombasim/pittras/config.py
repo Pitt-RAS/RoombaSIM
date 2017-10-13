@@ -59,3 +59,7 @@ PITTRAS_TAKEOFF_ANGLE_MODE_HEIGHT = 0.2
 
 # timeout for transforms
 PITTRAS_TAKEOFF_TRANSFORM_TIMEOUT = 0.2
+
+# distance from the target that the XYZTranslationTask
+# will deem "close enough" in meters
+PITTRAS_XYZ_TRANSLATION_ACCURACY = 0.2
