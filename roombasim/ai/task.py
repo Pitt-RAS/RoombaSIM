@@ -49,7 +49,7 @@ class TaskController(object):
         that will set the current task to 'idle' and will optionally
         call an additional callback function if it exists.
         '''
-        if callback != None:
+        if callback is not None:
             def fn(status, message):
                 self.switch_task('idle')
                 callback(status, message)
@@ -58,9 +58,8 @@ class TaskController(object):
         else:
             def fn(status, message):
                 self.switch_task('idle')
-            
+                
             return fn
-            
 
     def update(self, delta, elapsed, state_controller, environment):
         '''
