@@ -24,8 +24,8 @@ class XYZTranslationTask(Task):
         self.target_z = target[2]
 
         # PID controller contstants
-        self.k_xy = np.array([0.5,1.1,0])
-        self.k_z = np.array([0.5,0,0])
+        self.k_xy = cfg.PITTRAS_PID_XY
+        self.k_z = cfg.PITTRAS_PID_Z
 
         self.i_xy = np.array([0,0], dtype=np.float64)
         self.i_z = 0
