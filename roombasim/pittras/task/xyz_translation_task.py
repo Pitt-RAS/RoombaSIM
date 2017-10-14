@@ -5,7 +5,7 @@ import numpy as np
 
 import roombasim.config as cfg
 
-from roombasim.ai import Task
+from roombasim.ai import Task, TaskState
 
 class XYZTranslationTask(Task):
     '''
@@ -37,7 +37,7 @@ class XYZTranslationTask(Task):
         dist = np.linalg.norm(self.target_xy - drone_state['xy_pos'])
 
         if dist < cfg.PITTRAS_XYZ_TRANSLATION_ACCURACY:
-            self.complete(Task.SUCCESS)
+            self.complete(TaskState.SUCCESS)
             return
 
         # xy PID controller

@@ -58,7 +58,7 @@ class TaskController(object):
         else:
             def fn(status, message):
                 self.switch_task('idle')
-                
+
             return fn
 
     def update(self, delta, elapsed, state_controller, environment):
@@ -70,6 +70,13 @@ class TaskController(object):
         # else:
         #     print("[*] Warning: No task selected")
 
+class TaskState(object):
+    '''
+    An enum for task completion status.
+    '''
+    SUCCESS = 0
+    FAILURE = 1
+
 class Task(object):
     '''
     The base Task class.
@@ -77,11 +84,6 @@ class Task(object):
     Subclasses must implement the update method and can optionally
     override the __init__ constructor.
     '''
-
-    # Task completion enum
-    SUCCESS = 0
-    FAILURE = 1
-
     def __init__(self, **params):
         self.params = params
     
@@ -97,6 +99,9 @@ class Task(object):
     def complete(self, status, message=''):
         '''
         Signal the end of the task.
+
+        - status : TaskState enum
+        - [message] : optional message string
         '''
         if hasattr(self, '_completion_callback'):
             self._completion_callback(status, message)
