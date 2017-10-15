@@ -26,7 +26,7 @@ class Roomba(object):
     (No update function)
     '''
 
-    def __init__(self, pos, heading, tag=''):
+    def __init__(self, pos, heading, tag=None):
         '''
         Initialize a roomba object with a given position and heading.
         By default, the roomba starts in STATE_IDLE.

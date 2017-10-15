@@ -49,7 +49,8 @@ class Environment(object):
 
             target_roomba = roomba.TargetRoomba(
                 [np.cos(theta) * cfg.MISSION_TARGET_SPAWN_RADIUS + 10, np.sin(theta) * cfg.MISSION_TARGET_SPAWN_RADIUS + 10],
-                theta
+                theta,
+                tag=i
             )
 
             target_roomba.start()
@@ -62,7 +63,8 @@ class Environment(object):
 
             obstacle_roomba = roomba.ObstacleRoomba(
                 [np.cos(theta) * cfg.MISSION_OBSTACLE_SPAWN_RADIUS + 10, np.sin(theta) * cfg.MISSION_OBSTACLE_SPAWN_RADIUS + 10],
-                theta - (cfg.PI / 2)
+                theta - (cfg.PI / 2),
+                tag=i
             )
 
             obstacle_roomba.start()

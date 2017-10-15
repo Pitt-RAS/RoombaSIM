@@ -19,7 +19,8 @@ TASKS = {
 }
 
 STATES = {
-    'DroneState': DroneState
+    'DroneState': DroneState,
+    'RoombaState': RoombaState
 }
 
 RENDER_AGENT = render.render_pittrasdrone
