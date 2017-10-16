@@ -6,19 +6,15 @@ from roombasim.ai import Task, TaskState
 import roombasim.config as cfg
 from roombasim import geometry
 
-class TrackRoombaTask(Task):
+class GoToRoombaTask(Task):
 
-    def __init__(self, target_roomba, offset_xy, timeout):
+    def __init__(self, target_roomba, offset_xy):
         '''
         target_roomba - target roomba tag
         offset_xy - float[2] that defines x and y offset from the roomba
         '''
         self.target_roomba = target_roomba
         self.offset_xy = offset_xy
-        self.timeout = timeout
-
-        # TODO(hgarrereyn): remove once tasks get per-task elapsed time rather than global
-        self.start_time = None
 
         # PID controller contstants
         self.k_xy = cfg.PITTRAS_PID_XY
@@ -53,7 +49,7 @@ class TrackRoombaTask(Task):
 
         target_xy = np.array(roomba['pos']) + adjusted_offset_xy
 
-        if self.timeout > 0 and elapsed - self.start_time >= self.timeout:
+        if np.linalg.norm(target_xy - drone_state['xy_pos']) < cfg.PITTRAS_XYZ_TRANSLATION_ACCURACY:
             self.complete(TaskState.SUCCESS)
             return
 

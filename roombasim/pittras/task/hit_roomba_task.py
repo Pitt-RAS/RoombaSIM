@@ -1,31 +1,20 @@
 
 import numpy as np
 
+import roombasim.config as cfg
+
 from roombasim.ai import Task, TaskState
 
-import roombasim.config as cfg
-from roombasim import geometry
+class HitRoombaTask(Task):
 
-class TrackRoombaTask(Task):
-
-    def __init__(self, target_roomba, offset_xy, timeout):
-        '''
-        target_roomba - target roomba tag
-        offset_xy - float[2] that defines x and y offset from the roomba
-        '''
+    def __init__(self, target_roomba):
         self.target_roomba = target_roomba
-        self.offset_xy = offset_xy
-        self.timeout = timeout
-
-        # TODO(hgarrereyn): remove once tasks get per-task elapsed time rather than global
-        self.start_time = None
 
         # PID controller contstants
         self.k_xy = cfg.PITTRAS_PID_XY
         self.k_z = cfg.PITTRAS_PID_Z
-        self.k_yaw = cfg.PITTRAS_PID_Z
 
-        self.i_xy = np.array([0, 0], dtype=np.float64)
+        self.i_xy = np.array([0,0], dtype=np.float64)
         self.i_z = 0
 
         # estimate roomba velocity
@@ -44,17 +33,11 @@ class TrackRoombaTask(Task):
 
         roomba = target_roombas[self.target_roomba]
 
-        roomba_yaw = roomba['heading']
-        rot_matrix = np.array([
-            [np.cos(roomba_yaw), -np.sin(roomba_yaw)],
-            [np.sin(roomba_yaw), np.cos(roomba_yaw)]
-        ])
-        adjusted_offset_xy = rot_matrix.dot(self.offset_xy)
+        target_xy = np.array(roomba['pos'])
 
-        target_xy = np.array(roomba['pos']) + adjusted_offset_xy
-
-        if self.timeout > 0 and elapsed - self.start_time >= self.timeout:
-            self.complete(TaskState.SUCCESS)
+        # check if the roomba is too far away
+        if np.linalg.norm(target_xy - drone_state['xy_pos']) > cfg.PITTRAS_HIT_ROOMBA_MAX_START_DIST:
+            self.complete(TaskState.FAILURE, "Roomba is too far away")
             return
 
         if self.last_target_xy is None:
@@ -78,7 +61,7 @@ class TrackRoombaTask(Task):
         adjusted_xy = rot_matrix.dot(control_xy)
 
         # z PID controller
-        p_z = (cfg.PITTRAS_TRACK_ROOMBA_HEIGHT - drone_state['z_pos'])
+        p_z = (0 - drone_state['z_pos'])
         d_z = - drone_state['z_vel']
         self.i_z += p_z * delta
         control_z = self.k_z.dot([p_z, d_z, self.i_z])
@@ -87,3 +70,8 @@ class TrackRoombaTask(Task):
 
         # perform control action
         environment.agent.control(adjusted_xy, 0, control_z)
+
+        # check if we have hit the roomba
+        if drone_state['z_pos'] < cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT:
+            self.complete(TaskState.SUCCESS)
+            return

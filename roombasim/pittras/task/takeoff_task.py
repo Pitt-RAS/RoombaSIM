@@ -3,7 +3,7 @@ import numpy as np
 
 import roombasim.config as cfg
 
-from roombasim.ai import Task
+from roombasim.ai import Task, TaskState
 
 class TakeoffTaskState:
     init = 0
@@ -43,5 +43,7 @@ class TakeoffTask(Task):
                 self._state = TakeoffTaskState.done
 
                 control_z_vel = 0
+
+                self.complete(TaskState.SUCCESS)
 
         environment.agent.control(self.zero_xy_vel, 0, control_z_vel)

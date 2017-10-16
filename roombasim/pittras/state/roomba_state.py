@@ -31,12 +31,12 @@ class RoombaState(State):
         for r in environment.roombas:
             if r.tag is not None:
                 if isinstance(r, TargetRoomba):
-                    target_roombas[r] = {
+                    target_roombas[r.tag] = {
                         'pos': r.pos,
                         'heading': r.heading
                     }
                 elif isinstance(r, ObstacleRoomba):
-                    obstacle_roombas[r] = {
+                    obstacle_roombas[r.tag] = {
                         'pos': r.pos,
                         'heading': r.heading
                     }

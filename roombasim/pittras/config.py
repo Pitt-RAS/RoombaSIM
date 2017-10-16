@@ -15,7 +15,9 @@ CONTROLLER = WaypointDemoController
 
 TASKS = {
     'XYZTranslationTask': XYZTranslationTask,
-    'TakeoffTask': TakeoffTask
+    'TakeoffTask': TakeoffTask,
+    'GoToRoombaTask': GoToRoombaTask,
+    'HitRoombaTask': HitRoombaTask
 }
 
 STATES = {
@@ -67,8 +69,17 @@ PITTRAS_XYZ_TRANSLATION_ACCURACY = 0.2
 
 # PID constants for xy controller
 # [Kp,Kd,Ki]
-PITTRAS_PID_XY = np.array([0.5,1.1,0])
+PITTRAS_PID_XY = np.array([0.5, 1.1, 0])
 
 # PID constants for z controller
 # [Kp,Kd,Ki]
-PITTRAS_PID_Z = np.array([0.5,0,0])
+PITTRAS_PID_Z = np.array([0.5, 0, 0])
+
+# hover height while tracking roomba in meters
+PITTRAS_TRACK_ROOMBA_HEIGHT = 1
+
+# minimum distance to allow hit roomba task to run in meters
+PITTRAS_HIT_ROOMBA_MAX_START_DIST = 0.5
+
+# descent velocity for hit roomba task
+PITTRAS_HIT_DESCENT_VELOCITY = -0.2
