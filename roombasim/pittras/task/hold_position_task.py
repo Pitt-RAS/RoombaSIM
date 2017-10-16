@@ -4,7 +4,9 @@ hold_position_task.py
 
 import numpy as np
 
-from roombasim.ai import Task
+import roombasim.config as cfg
+
+from roombasim.ai import Task, TaskState
 
 class HoldPositionTaskStates:
     '''
@@ -33,16 +35,15 @@ class HoldPositionTask(Task):
         self.hold_z = 0
 
         # PID controller contstants
-        self.k_xy = np.array([0.5,1.1,0])
-        self.k_z = np.array([0.5,1.1,0])
+        self.k_xy = cfg.PITTRAS_PID_XY
+        self.k_z = cfg.PITTRAS_PID_Z
 
         self.i_xy = np.array([0,0], dtype=np.float64)
         self.i_z = 0
 
     def update(self, delta, elapsed, state_controller, environment):
-        if self.state == HoldPositionTaskStates.done:
-            # TODO(zacyu): Signal the termination of the task when such
-            #              capability is added to the framework.
+        if (self.state == HoldPositionTaskStates.done or
+                self.state == HoldPositionTaskStates.failed):
             return
 
         # Fetch current odometry
@@ -61,10 +62,10 @@ class HoldPositionTask(Task):
                                          self.hold_duration * 1000):
             if (drone_state['xy_pos'] == self.hold_xy and
                 drone_state['z_pos'] == self.hold_z):
+                self.complete(TaskState.SUCCESS)
                 self.state = HoldPositionTaskStates.done
             else:
-                # When the drone fails to return to hold position by the end of
-                # the holding duration.
+                self.complete(TaskState.FAILURE)
                 self.state = HoldPositionTaskStates.failed
 
         # Return to hold position
