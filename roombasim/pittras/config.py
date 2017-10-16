@@ -60,6 +60,12 @@ PITTRAS_TAKEOFF_ANGLE_MODE_HEIGHT = 0.2
 # timeout for transforms
 PITTRAS_TAKEOFF_TRANSFORM_TIMEOUT = 0.2
 
+# velocity with which to land with
+PITTRAS_LAND_VELOCITY = -0.2
+
+# height below which landing is considered finished
+PITTRAS_LAND_HEIGHT_TOLERANCE = 0.15
+
 # distance from the target that the XYZTranslationTask
 # will deem "close enough" in meters
 PITTRAS_XYZ_TRANSLATION_ACCURACY = 0.2
