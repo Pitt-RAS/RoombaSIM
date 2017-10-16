@@ -3,7 +3,9 @@ xyz_translation_task.py
 '''
 import numpy as np
 
-from roombasim.ai import Task
+import roombasim.config as cfg
+
+from roombasim.ai import Task, TaskState
 
 class XYZTranslationTask(Task):
     '''
@@ -22,8 +24,8 @@ class XYZTranslationTask(Task):
         self.target_z = target[2]
 
         # PID controller contstants
-        self.k_xy = np.array([0.5,1.1,0])
-        self.k_z = np.array([0.5,1.1,0])
+        self.k_xy = cfg.PITTRAS_PID_XY
+        self.k_z = cfg.PITTRAS_PID_Z
 
         self.i_xy = np.array([0,0], dtype=np.float64)
         self.i_z = 0
@@ -31,6 +33,12 @@ class XYZTranslationTask(Task):
     def update(self, delta, elapsed, state_controller, environment):
         # fetch current odometry
         drone_state = state_controller.query('DroneState', environment)
+
+        dist = np.linalg.norm(self.target_xy - drone_state['xy_pos'])
+
+        if dist < cfg.PITTRAS_XYZ_TRANSLATION_ACCURACY:
+            self.complete(TaskState.SUCCESS)
+            return
 
         # xy PID controller
         p_xy = (self.target_xy - drone_state['xy_pos'])
