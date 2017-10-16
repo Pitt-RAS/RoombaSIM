@@ -15,7 +15,8 @@ CONTROLLER = WaypointDemoController
 
 TASKS = {
     'XYZTranslationTask': XYZTranslationTask,
-    'TakeoffTask': TakeoffTask
+    'TakeoffTask': TakeoffTask,
+    'LandTask': LandTask
 }
 
 STATES = {
