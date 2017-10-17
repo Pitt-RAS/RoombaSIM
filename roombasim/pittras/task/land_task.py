@@ -22,7 +22,7 @@ class LandTask(Task):
         height = drone_state['z_pos']
 
         # Check if we reached the target landing height tolerance
-        if height > cfg.PITTRAS_LAND_HEIGHT_TOLERANCE:
+        if height > 0:
             # Descend if above the landing height tolerance
             self._state = LandTaskState.descend
 
