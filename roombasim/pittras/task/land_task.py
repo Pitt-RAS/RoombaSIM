@@ -5,7 +5,7 @@ import roombasim.config as cfg
 
 from roombasim.ai import Task, TaskState
 
-class LandTaskState:
+class LandTaskState(object):
     init = 0
     descend = 1
     done = 2
