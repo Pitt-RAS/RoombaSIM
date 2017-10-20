@@ -2,8 +2,7 @@
 land_demo_controller.py
 '''
 
-from roombasim.ai import Controller
-from roombasim.ai.task import TaskState
+from roombasim.ai import Controller, TaskState
 
 class LandDemoController(Controller):
 
