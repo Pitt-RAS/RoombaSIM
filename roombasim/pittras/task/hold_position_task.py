@@ -8,6 +8,7 @@ import roombasim.config as cfg
 
 from roombasim.ai import Task, TaskState
 
+
 class HoldPositionTaskStates:
     '''
     States for the Hold Position task.
@@ -16,6 +17,7 @@ class HoldPositionTaskStates:
     holding = 1
     done = 2
     failed = 3
+
 
 class HoldPositionTask(Task):
     '''
@@ -31,14 +33,14 @@ class HoldPositionTask(Task):
 
         # Hold position properties
         self.start_time = 0
-        self.hold_xy = np.array([0,0])
+        self.hold_xy = np.array([0, 0])
         self.hold_z = 0
 
         # PID controller contstants
         self.k_xy = cfg.PITTRAS_PID_XY
         self.k_z = cfg.PITTRAS_PID_Z
 
-        self.i_xy = np.array([0,0], dtype=np.float64)
+        self.i_xy = np.array([0, 0], dtype=np.float64)
         self.i_z = 0
 
     def update(self, delta, elapsed, state_controller, environment):
@@ -60,8 +62,10 @@ class HoldPositionTask(Task):
 
         if (self.hold_duration > 0) and (elapsed - self.start_time >
                                          self.hold_duration * 1000):
-            if (drone_state['xy_pos'] == self.hold_xy and
-                drone_state['z_pos'] == self.hold_z):
+            if (np.linalg.norm(drone_state['xy_pos'] - self.hold_xy) <
+                    cfg.PITTRAS_XYZ_TRANSLATION_ACCURACY and
+                    drone_state['z_pos'] - self.hold_z <
+                    cfg.PITTRAS_XYZ_TRANSLATION_ACCURACY):
                 self.complete(TaskState.SUCCESS)
                 self.state = HoldPositionTaskStates.done
             else:
