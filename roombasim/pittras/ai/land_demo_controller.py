@@ -9,11 +9,11 @@ class LandDemoController(Controller):
     def setup(self):
         self._switched = False
 
-        # TODO(mbilker): is there a way to initialize the drone to an
-        # arbitrary height above PITTRAS_LAND_HEIGHT_TOLERANCE instead of using
-        # TakeoffTask to get the height up
+        # TODO: initialize the drone to an arbitrary height because this is a
+        # demo controller for testing LandTask.
+
         self.task_controller.switch_task(
-            'TakeoffTask'
+            'LandTask'
         )
 
     def land_callback(self, status, message):
@@ -23,13 +23,4 @@ class LandDemoController(Controller):
             print("Landing successful!")
 
     def update(self, delta, elapsed):
-        # switch to landing after five seconds
-        if not self._switched and elapsed > 5000:
-            print("Switching to LandTask")
-
-            self._switched = True
-
-            self.task_controller.switch_task(
-                'LandTask',
-                callback = self.land_callback
-            )
+        pass
