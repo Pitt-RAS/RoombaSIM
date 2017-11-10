@@ -22,6 +22,8 @@ class LandTask(Task):
         height = drone_state['z_pos']
 
         # Check if we reached the target landing height tolerance
+        # TODO: if landing sensors are provided via the state controller
+        # then use them to determine if the drone has landed
         if height > 0:
             # Descend if above the landing height tolerance
             self._state = LandTaskState.descend
