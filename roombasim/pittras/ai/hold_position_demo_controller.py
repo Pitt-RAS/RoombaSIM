@@ -4,7 +4,7 @@ hold_position_demo_controller.py
 
 from roombasim.ai import Controller
 
-def hold_position_task_completion_callback(status):
+def hold_position_task_completion_callback(status, message):
     '''
     Callback for Hold Position task completion.
     '''
