@@ -7,4 +7,3 @@ class TakeoffDemoController(Controller):
         self.task_controller.switch_task(
             'TakeoffTask'
         )
-    

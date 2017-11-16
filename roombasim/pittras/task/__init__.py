@@ -4,5 +4,6 @@ roombasim.pittras.task
 
 Task classes
 '''
-from xyz_translation_task import XYZTranslationTask
-from takeoff_task import TakeoffTask
+from .xyz_translation_task import XYZTranslationTask
+from .takeoff_task import TakeoffTask
+from .hold_position_task import HoldPositionTask
