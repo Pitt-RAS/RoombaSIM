@@ -38,7 +38,7 @@ class Drone(object):
     makes simulating motion quite a bit simpler.
     '''
 
-    def __init__(self, pos, yaw):
+    def __init__(self, pos, yaw, z_pos=0):
         # 2d position vector
         # m
         self.xy_pos = np.array(pos, dtype=np.float64)
@@ -68,7 +68,7 @@ class Drone(object):
         # distance from the ground
         # (when landed, this should be zero)
         # m
-        self.z_pos = 0
+        self.z_pos = z_pos
 
         # z axis velocity (+ is up)
         # m/s
