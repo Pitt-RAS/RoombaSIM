@@ -6,6 +6,12 @@ from roombasim.ai import Controller, TaskState
 
 class LandDemoController(Controller):
 
+    def land_callback(self, status, message):
+        print("Landing callback")
+
+        if status == TaskState.SUCCESS:
+            print("Landing successful!")
+
     def setup(self):
         self._switched = False
 
@@ -13,14 +19,9 @@ class LandDemoController(Controller):
         # demo controller for testing LandTask.
 
         self.task_controller.switch_task(
-            'LandTask'
+            'LandTask',
+            callback=self.land_callback
         )
-
-    def land_callback(self, status, message):
-        print("Landing callback")
-
-        if status == TaskState.SUCCESS:
-            print("Landing successful!")
 
     def update(self, delta, elapsed):
         pass

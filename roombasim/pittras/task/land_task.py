@@ -18,7 +18,7 @@ class LandTask(Task):
 
     def update(self, delta, elapsed, state_controller, environment):
         drone_state = state_controller.query('DroneState', environment)
-
+        
         height = drone_state['z_pos']
 
         # Check if we reached the target landing height tolerance
