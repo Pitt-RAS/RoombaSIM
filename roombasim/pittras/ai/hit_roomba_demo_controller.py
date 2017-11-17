@@ -33,11 +33,11 @@ class HitRoombaDemoController(Controller):
         self.task_controller.switch_task(
             'XYZTranslationTask',
             target=[10,10,1],
-            callback=(lambda a,b: self.land())
+            callback=(lambda a,b: self.hover())
         )
 
-    def land(self):
+    def hover(self):
         self.task_controller.switch_task(
-            'XYZTranslationTask',
-            target=[1,1,0]
+            'HoldPositionTask',
+            hold_duration=0
         )

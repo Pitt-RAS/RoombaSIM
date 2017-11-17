@@ -18,6 +18,7 @@ TASKS = {
     'XYZTranslationTask': XYZTranslationTask,
     'TakeoffTask': TakeoffTask,
     'GoToRoombaTask': GoToRoombaTask,
+    'TrackRoombaTask': TrackRoombaTask,
     'HitRoombaTask': HitRoombaTask,
     'LandTask': LandTask
 }

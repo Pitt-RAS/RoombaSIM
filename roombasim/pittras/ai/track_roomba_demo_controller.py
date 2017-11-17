@@ -16,25 +16,35 @@ class TrackRoombaDemoController(Controller):
         self.target = 0
 
         # set the initial target
-        self.task_controller.switch_task(
-            'GoToRoombaTask',
-            target_roomba = self.target,
-            offset_xy = [-1, 0]
-        )
+        self.go_to(0)
 
         self.last_switch = 0
 
+    def go_to(self, roomba):
+        print("Going to: " + str(roomba))
+        self.task_controller.switch_task(
+            'GoToRoombaTask',
+            target_roomba = roomba,
+            offset_xy = [0, 0],
+            callback=(lambda a,b: self.track(roomba))
+        )
+
+    def track(self, roomba):
+        print("Tracking: " + str(roomba))
+        self.task_controller.switch_task(
+            'TrackRoombaTask',
+            target_roomba = roomba,
+            offset_xy = [0, 0],
+            timeout = 0
+        )
+
     def update(self, delta, elapsed):
         # switch after five seconds
-        if (elapsed - self.last_switch > 25000):
+        if (elapsed - self.last_switch > 8000):
             self.target = (self.target + 1) % cfg.MISSION_NUM_TARGETS
 
             # construct the new task
-            self.task_controller.switch_task(
-                'GoToRoombaTask',
-                target_roomba = self.target,
-                offset_xy = [-1, 0]
-            )
+            self.go_to(self.target)
 
             # TODO: implement logging
             print("New target: " + str(self.target))
