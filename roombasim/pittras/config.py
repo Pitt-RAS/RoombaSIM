@@ -78,7 +78,6 @@ PITTRAS_PID_XY = np.array([0.5, 1.1, 0])
 
 # PID constants for z controller
 # [Kp,Kd,Ki]
-<<<<<<< HEAD
 PITTRAS_PID_Z = np.array([0.5, 0, 0])
 
 # hover height while tracking roomba in meters
@@ -89,9 +88,6 @@ PITTRAS_HIT_ROOMBA_MAX_START_DIST = 0.5
 
 # descent velocity for hit roomba task
 PITTRAS_HIT_DESCENT_VELOCITY = -0.2
-=======
-PITTRAS_PID_Z = np.array([0.5,0,0])
 
 # Tolerance for distance comparasion in the HoldPositionTask
 PITTRAS_HOLD_POSITION_TOLERANCE = 0.2
->>>>>>> master
