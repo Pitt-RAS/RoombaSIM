@@ -21,6 +21,10 @@ def main():
     controller_parser = subparsers.add_parser('run')
     controller_parser.add_argument('config')
     controller_parser.add_argument('controller')
+    controller_parser.add_argument('-start_location',
+                                   type=float,
+                                   nargs=3,
+                                   default=[1.5, 1.5, 0.0])
 
     demo_parser = subparsers.add_parser('demo')
     demo_parser.add_argument('-num_targets', type=int, choices=range(1,25))
@@ -85,7 +89,8 @@ def run_controller(args):
     environment.reset()
 
     # setup agent
-    agent = cfg.AGENT([1.5,1.5], 0)
+    location = args.start_location
+    agent = cfg.AGENT([location[0],location[1]], 0, location[2])
     environment.agent = agent
 
     # create window so the keyboard can access it
