@@ -84,6 +84,8 @@ class Environment(object):
         '''
         for i in range(len(self.roombas)):
             rba = self.roombas[i]
+            if (rba.state == cfg.ROOMBA_STATE_IDLE):
+                continue
             rba.update(delta, elapsed)
 
             # Perform roomba-to-roomba collision detection
@@ -104,9 +106,10 @@ class Environment(object):
                     rba.collisions['front'] = True
 
             # Check if the roomba has left the arena
-            # (has_left, side) = Environment._check_bounds(rba)
-            # if has_left:
-            #     rba.stop()
+            (has_left, reward) = Environment._check_bounds(rba)
+            if has_left:
+                print('roomba left, reward: ' + str(reward))
+                rba.stop()
         
         # update the drone
         self.agent.update(delta, elapsed)
@@ -145,5 +148,17 @@ class Environment(object):
         reward - 1 only if the roomba crossed the goal line,
             0 otherwise
         '''
-        pass
+        has_left = False
+        reward = 0
+
+        if (r.pos[0] < -cfg.ROOMBA_RADIUS 
+            or r.pos[1] < -cfg.ROOMBA_RADIUS 
+            or r.pos[0] > 20 + cfg.ROOMBA_RADIUS 
+            or r.pos[1] > 20 + cfg.ROOMBA_RADIUS):
+            has_left = True
+
+        if (r.pos[0] > 20 + cfg.ROOMBA_RADIUS):
+            reward = 1
+
+        return (has_left, reward)
         
