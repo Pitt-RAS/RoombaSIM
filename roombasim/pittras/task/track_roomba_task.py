@@ -32,6 +32,10 @@ class TrackRoombaTask(Task):
         self.last_target_xy = None
 
     def update(self, delta, elapsed, state_controller, environment):
+        # first update
+        if self.start_time is None:
+            self.start_time = elapsed
+
         # fetch roomba odometry
         target_roombas, _ = state_controller.query('RoombaState', environment)
 
@@ -44,14 +48,14 @@ class TrackRoombaTask(Task):
 
         roomba = target_roombas[self.target_roomba]
 
-        roomba_yaw = roomba['heading']
-        rot_matrix = np.array([
-            [np.cos(roomba_yaw), -np.sin(roomba_yaw)],
-            [np.sin(roomba_yaw), np.cos(roomba_yaw)]
-        ])
-        adjusted_offset_xy = rot_matrix.dot(self.offset_xy)
+        # roomba_yaw = roomba['heading']
+        # rot_matrix = np.array([
+        #     [np.cos(roomba_yaw), -np.sin(roomba_yaw)],
+        #     [np.sin(roomba_yaw), np.cos(roomba_yaw)]
+        # ])
+        # adjusted_offset_xy = rot_matrix.dot(self.offset_xy)
 
-        target_xy = np.array(roomba['pos']) + adjusted_offset_xy
+        target_xy = np.array(roomba['pos']) + self.offset_xy
 
         if self.timeout > 0 and elapsed - self.start_time >= self.timeout:
             self.complete(TaskState.SUCCESS)

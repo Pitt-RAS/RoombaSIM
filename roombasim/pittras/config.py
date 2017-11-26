@@ -20,7 +20,8 @@ TASKS = {
     'GoToRoombaTask': GoToRoombaTask,
     'TrackRoombaTask': TrackRoombaTask,
     'HitRoombaTask': HitRoombaTask,
-    'LandTask': LandTask
+    'LandTask': LandTask,
+    'BlockRoombaTask': BlockRoombaTask
 }
 
 STATES = {
@@ -79,7 +80,11 @@ PITTRAS_PID_XY = np.array([0.5, 1.1, 0])
 
 # PID constants for z controller
 # [Kp,Kd,Ki]
-PITTRAS_PID_Z = np.array([0.5, 0, 0])
+PITTRAS_PID_Z = np.array([0.9, 0, 0])
+
+# PID constants for yaw controller
+# [Kp,Kd,Ki]
+PITTRAS_PID_YAW = np.array([0.5, 0, 0])
 
 # hover height while tracking roomba in meters
 PITTRAS_TRACK_ROOMBA_HEIGHT = 1
