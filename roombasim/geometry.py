@@ -112,3 +112,15 @@ def circle_intersects_line(circle, radius, p0, p1):
     dist = np.linalg.norm(proj_point - np.array(circle))
 
     return dist < radius
+
+def rotate_vector(vector, theta):
+    '''
+    Returns the given vector rotated clockwise about the origin
+    by theta.
+    '''
+    rot_matrix = np.array([
+        [np.cos(theta), -np.sin(theta)],
+        [np.sin(theta), np.cos(theta)]
+    ])
+
+    return rot_matrix.dot(vector)

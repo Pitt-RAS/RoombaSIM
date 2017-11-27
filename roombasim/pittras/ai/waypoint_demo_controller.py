@@ -28,7 +28,7 @@ class WaypointDemoController(Controller):
 
         self.selected = 0
 
-    def update(self, delta, elapsed):
+    def update(self, delta, elapsed, environment):
         # switch after five seconds
         if (elapsed - self.last_switch > 5000):
             self.selected = (self.selected + 1) % len(self.waypoints)
