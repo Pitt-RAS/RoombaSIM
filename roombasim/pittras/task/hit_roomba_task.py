@@ -1,21 +1,25 @@
-
+'''
+hit_roomba_task.py
+'''
 import numpy as np
 
 import roombasim.config as cfg
 
 from roombasim.ai import Task, TaskState
+from roombasim.pid_controller import PIDController
+from roombasim import geometry
 
 class HitRoombaTask(Task):
+    '''
+    A task to bump the top of a roomba.
+    '''
 
     def __init__(self, target_roomba):
         self.target_roomba = target_roomba
 
-        # PID controller contstants
-        self.k_xy = cfg.PITTRAS_PID_XY
-        self.k_z = cfg.PITTRAS_PID_Z
-
-        self.i_xy = np.array([0,0], dtype=np.float64)
-        self.i_z = 0
+        # PID controllers
+        self.pid_xy = PIDController(cfg.PITTRAS_PID_XY, dimensions=2)
+        self.pid_z = PIDController(cfg.PITTRAS_PID_Z)
 
         # estimate roomba velocity
         self.last_target_xy = None
@@ -45,28 +49,21 @@ class HitRoombaTask(Task):
 
         target_vel_xy = ((target_xy - self.last_target_xy) / delta)
 
-        # xy PID controller
-        p_xy = (target_xy - drone_state['xy_pos'])
-        d_xy = target_vel_xy - drone_state['xy_vel']
-        self.i_xy += p_xy * delta
-        control_xy = self.k_xy.dot([p_xy, d_xy, self.i_xy])
+        # PID calculations
+        control_xy = self.pid_xy.get_control(
+            target_xy - drone_state['xy_pos'],
+            target_vel_xy - drone_state['xy_vel'],
+            delta
+        )
 
-        # rotate the control xy vector counterclockwise about
-        # the origin by the current yaw
-        yaw = -drone_state['yaw']
-        rot_matrix = np.array([
-            [np.cos(yaw), -np.sin(yaw)],
-            [np.sin(yaw), np.cos(yaw)]
-        ])
-        adjusted_xy = rot_matrix.dot(control_xy)
+        control_z = self.pid_z.get_control(
+            -drone_state['z_pos'],
+            -drone_state['z_vel'],
+            delta
+        )
 
-        # z PID controller
-        p_z = (0 - drone_state['z_pos'])
-        d_z = - drone_state['z_vel']
-        self.i_z += p_z * delta
-        control_z = self.k_z.dot([p_z, d_z, self.i_z])
-
-        self.last_target_xy = target_xy
+        # normalize acceleration vector
+        adjusted_xy = geometry.rotate_vector(control_xy, -drone_state['yaw'])
 
         # perform control action
         environment.agent.control(adjusted_xy, 0, control_z)
@@ -75,3 +72,6 @@ class HitRoombaTask(Task):
         if drone_state['z_pos'] < cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT:
             self.complete(TaskState.SUCCESS)
             return
+
+        # update delayed trackers
+        self.last_target_xy = target_xy

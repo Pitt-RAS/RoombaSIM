@@ -5,6 +5,9 @@ land_demo_controller.py
 from roombasim.ai import Controller, TaskState
 
 class LandDemoController(Controller):
+    '''
+    Demonstrates a takeoff followed by a landing.
+    '''
 
     def land_callback(self, status, message):
         print("Landing callback")
@@ -13,15 +16,13 @@ class LandDemoController(Controller):
             print("Landing successful!")
 
     def setup(self):
-        self._switched = False
+        self.task_controller.switch_task(
+            'TakeoffTask',
+            callback=(lambda a,b: self.land())
+        )
 
-        # TODO: initialize the drone to an arbitrary height because this is a
-        # demo controller for testing LandTask.
-
+    def land(self):
         self.task_controller.switch_task(
             'LandTask',
             callback=self.land_callback
         )
-
-    def update(self, delta, elapsed):
-        pass

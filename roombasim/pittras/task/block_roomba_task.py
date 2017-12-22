@@ -1,17 +1,24 @@
-
+'''
+block_roomba_task.py
+'''
 import numpy as np
 
-from roombasim.ai import Task, TaskState
-
 import roombasim.config as cfg
+
+from roombasim.ai import Task, TaskState
+from roombasim.pid_controller import PIDController
 from roombasim import geometry
 
 class BlockRoombaTask(Task):
+    '''
+    A task that lands in front of a roomba.
+    '''
 
     def __init__(self, target_roomba, block_vector):
         '''
         target_roomba - target roomba tag
-        block_vector - where to land with respect to the roomba
+        block_vector - float[2] that specifies where to land with respect to the
+            the target roomba
         '''
         self.target_roomba = target_roomba
         self.block_vector = block_vector
@@ -20,17 +27,10 @@ class BlockRoombaTask(Task):
         self.target_yaw = None
         self.target_xy = None
 
-        # PID controller contstants
-        self.k_xy = cfg.PITTRAS_PID_XY
-        self.k_z = cfg.PITTRAS_PID_Z
-        self.k_yaw = cfg.PITTRAS_PID_YAW
-
-        self.i_xy = np.array([0, 0], dtype=np.float64)
-        self.i_z = 0
-        self.i_yaw = 0
-
-        # estimate roomba velocity
-        self.last_target_xy = None
+        # PID controllers
+        self.pid_xy = PIDController(cfg.PITTRAS_PID_XY, dimensions=2)
+        self.pid_z = PIDController(cfg.PITTRAS_PID_Z)
+        self.pid_yaw = PIDController(cfg.PITTRAS_PID_YAW)
 
     def update(self, delta, elapsed, state_controller, environment):
         # fetch roomba odometry
@@ -54,48 +54,41 @@ class BlockRoombaTask(Task):
                 roomba['heading']
             )
 
+        # calculate the target landing position
         if self.target_xy is None:
             self.target_xy = np.array(roomba['pos']) + self.block_vector
 
-        # if np.linalg.norm(target_xy - drone_state['xy_pos']) < cfg.PITTRAS_XYZ_TRANSLATION_ACCURACY:
-        #     self.complete(TaskState.SUCCESS)
-        #     return
+        # PID calculations
+        control_xy = self.pid_xy.get_control(
+            self.target_xy - drone_state['xy_pos'],
+            -drone_state['xy_vel'],
+            delta
+        )
 
-        # xy PID controller
-        p_xy = (self.target_xy - drone_state['xy_pos'])
-        d_xy = -drone_state['xy_vel']
-        self.i_xy += p_xy * delta
-        control_xy = self.k_xy.dot([p_xy, d_xy, self.i_xy])
+        control_z = self.pid_z.get_control(
+            -drone_state['z_pos'],
+            -drone_state['z_vel'],
+            delta
+        )
 
-        # rotate the control xy vector counterclockwise about
-        # the origin by the current yaw
-        yaw = -drone_state['yaw']
-        rot_matrix = np.array([
-            [np.cos(yaw), -np.sin(yaw)],
-            [np.sin(yaw), np.cos(yaw)]
-        ])
-        adjusted_xy = rot_matrix.dot(control_xy)
+        control_yaw = self.pid_yaw.get_control(
+            self.target_yaw - drone_state['yaw'],
+            -drone_state['yaw'],
+            delta
+        )
 
-        # z PID controller
-        p_z = - drone_state['z_pos']
-        d_z = - drone_state['z_vel']
-        self.i_z += p_z * delta
-        control_z = self.k_z.dot([p_z, d_z, self.i_z])
-
-        # yaw PID controller
-        p_yaw = (self.target_yaw - drone_state['yaw'])
-        d_yaw = - drone_state['yaw_vel']
-        self.i_yaw += p_yaw * delta
-        control_yaw = self.k_yaw.dot([p_yaw, d_yaw, self.i_yaw])
-
-        # self.last_target_xy = target_xy
+        # normalize acceleration vector
+        adjusted_xy = geometry.rotate_vector(control_xy, -drone_state['yaw'])
 
         # perform control action
         environment.agent.control(adjusted_xy, control_yaw, control_z)
 
-
     @staticmethod
     def _calculate_target_yaw(drone_heading, roomba_heading):
+        '''
+        Returns a yaw within 45 degrees of the current drone heading
+        such that one of the four faces is perpendicular to the roomba.
+        '''
         angle_diff = (drone_heading - roomba_heading) % (np.pi / 2)
 
         if angle_diff < (np.pi / 4):

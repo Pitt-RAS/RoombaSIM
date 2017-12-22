@@ -59,24 +59,28 @@ def _load_class(cpath):
         mod = __import__('.'.join(attr[:-1]))
         for a in attr[1:]:
             mod = getattr(mod, a)
-        return mod
-    except Exception:
-        return None
+        return (mod, None)
+    except Exception as e:
+        return (None, e)
 
 
 def run_controller(args):
-    config = _load_class(args.config)
+    config, err = _load_class(args.config)
 
     if (config is None):
         print("Couldn't load config path: " + str(args.config))
+        print('See the following error:\n')
+        print(err)
         return
     else:
         cfg.load(config)
 
-    controller_p = _load_class(args.controller)
+    controller_p, err = _load_class(args.controller)
 
     if (controller_p is None):
         print("Couldn't load class: " + str(args.controller))
+        print('See the following error:\n')
+        print(err)
         return
     else:
         print("Loaded Controller: " + str(controller_p))

@@ -9,4 +9,4 @@ from .track_roomba_demo_controller import TrackRoombaDemoController
 from .hit_roomba_demo_controller import HitRoombaDemoController
 from .land_demo_controller import LandDemoController
 from .hold_position_demo_controller import HoldPositionDemoController
-from .force_roomba_controller import ForceRoombaController
+from .hard_landing_demo_controller import HardLandingDemoController

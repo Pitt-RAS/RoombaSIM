@@ -84,13 +84,17 @@ class Environment(object):
         '''
         for i in range(len(self.roombas)):
             rba = self.roombas[i]
+
+            # ignore roombas that left the arena
             if (rba.state == cfg.ROOMBA_STATE_IDLE):
                 continue
+
             rba.update(delta, elapsed)
 
             # Perform roomba-to-roomba collision detection
             for j in range(len(self.roombas)):
-                if i == j:
+                # ignore self collisions and collisions with roombas that left
+                if i == j or self.roombas[j].state == cfg.ROOMBA_STATE_IDLE:
                     continue
 
                 if Environment._check_roomba_collision(rba, self.roombas[j]):

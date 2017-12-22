@@ -1,14 +1,15 @@
 '''
 track_roomba_demo_controller.py
 '''
-
 from roombasim.ai import Controller
 
 import roombasim.config as cfg
 
 class TrackRoombaDemoController(Controller):
     '''
-    
+    A demonstration of the GoToRoomba and TrackRoomba tasks.
+
+    Every 8 seconds, the drone will fly to a new target and track it.
     '''
 
     def setup(self):
@@ -16,7 +17,7 @@ class TrackRoombaDemoController(Controller):
         self.target = 0
 
         # set the initial target
-        self.go_to(0)
+        self.go_to(self.target)
 
         self.last_switch = 0
 
@@ -38,8 +39,8 @@ class TrackRoombaDemoController(Controller):
             timeout = 0
         )
 
-    def update(self, delta, elapsed):
-        # switch after five seconds
+    def update(self, delta, elapsed, environment):
+        # switch every 8 seconds
         if (elapsed - self.last_switch > 8000):
             self.target = (self.target + 1) % cfg.MISSION_NUM_TARGETS
 
