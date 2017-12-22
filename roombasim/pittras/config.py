@@ -21,7 +21,8 @@ TASKS = {
     'TrackRoombaTask': TrackRoombaTask,
     'HitRoombaTask': HitRoombaTask,
     'LandTask': LandTask,
-    'BlockRoombaTask': BlockRoombaTask
+    'BlockRoombaTask': BlockRoombaTask,
+    'VelocityTask': VelocityTask
 }
 
 STATES = {
@@ -97,3 +98,6 @@ PITTRAS_HIT_DESCENT_VELOCITY = -0.2
 
 # Tolerance for distance comparasion in the HoldPositionTask
 PITTRAS_HOLD_POSITION_TOLERANCE = 0.2
+
+# Tolerance for speed comparasion in the VelocityTask
+PITTRAS_VELOCITY_TOLERANCE = 0.1
