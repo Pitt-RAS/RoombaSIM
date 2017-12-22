@@ -1,9 +1,11 @@
-
+'''
+takeoff_task.py
+'''
 import numpy as np
 
 import roombasim.config as cfg
 
-from roombasim.ai import Task
+from roombasim.ai import Task, TaskState
 
 class TakeoffTaskState:
     init = 0
@@ -16,6 +18,14 @@ class TakeoffTaskState:
     failed = 7
 
 class TakeoffTask(Task):
+    '''
+    A task to control drone takeoff.
+
+    The drone will wait for PITTRAS_DELAY_BEFORE_TAKEOFF seconds before
+    accelerating upwards with a target velocity of PITTRAS_TAKEOFF_VELOCITY
+    until reaching a height of PITTRAS_TAKEOFF_COMPLETE_HEIGHT at which point
+    the task will terminate with SUCCESS.
+    '''
 
     def __init__(self):
         # null velocities
@@ -43,5 +53,7 @@ class TakeoffTask(Task):
                 self._state = TakeoffTaskState.done
 
                 control_z_vel = 0
+
+                self.complete(TaskState.SUCCESS)
 
         environment.agent.control(self.zero_xy_vel, 0, control_z_vel)

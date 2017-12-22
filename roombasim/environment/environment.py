@@ -49,7 +49,8 @@ class Environment(object):
 
             target_roomba = roomba.TargetRoomba(
                 [np.cos(theta) * cfg.MISSION_TARGET_SPAWN_RADIUS + 10, np.sin(theta) * cfg.MISSION_TARGET_SPAWN_RADIUS + 10],
-                theta
+                theta,
+                tag=i
             )
 
             target_roomba.start()
@@ -62,7 +63,8 @@ class Environment(object):
 
             obstacle_roomba = roomba.ObstacleRoomba(
                 [np.cos(theta) * cfg.MISSION_OBSTACLE_SPAWN_RADIUS + 10, np.sin(theta) * cfg.MISSION_OBSTACLE_SPAWN_RADIUS + 10],
-                theta - (cfg.PI / 2)
+                theta - (cfg.PI / 2),
+                tag=i
             )
 
             obstacle_roomba.start()
@@ -82,11 +84,17 @@ class Environment(object):
         '''
         for i in range(len(self.roombas)):
             rba = self.roombas[i]
+
+            # ignore roombas that left the arena
+            if (rba.state == cfg.ROOMBA_STATE_IDLE):
+                continue
+
             rba.update(delta, elapsed)
 
             # Perform roomba-to-roomba collision detection
             for j in range(len(self.roombas)):
-                if i == j:
+                # ignore self collisions and collisions with roombas that left
+                if i == j or self.roombas[j].state == cfg.ROOMBA_STATE_IDLE:
                     continue
 
                 if Environment._check_roomba_collision(rba, self.roombas[j]):
@@ -102,9 +110,10 @@ class Environment(object):
                     rba.collisions['front'] = True
 
             # Check if the roomba has left the arena
-            # (has_left, side) = Environment._check_bounds(rba)
-            # if has_left:
-            #     rba.stop()
+            (has_left, reward) = Environment._check_bounds(rba)
+            if has_left:
+                print('roomba left, reward: ' + str(reward))
+                rba.stop()
         
         # update the drone
         self.agent.update(delta, elapsed)
@@ -143,5 +152,17 @@ class Environment(object):
         reward - 1 only if the roomba crossed the goal line,
             0 otherwise
         '''
-        pass
+        has_left = False
+        reward = 0
+
+        if (r.pos[0] < -cfg.ROOMBA_RADIUS 
+            or r.pos[1] < -cfg.ROOMBA_RADIUS 
+            or r.pos[0] > 20 + cfg.ROOMBA_RADIUS 
+            or r.pos[1] > 20 + cfg.ROOMBA_RADIUS):
+            has_left = True
+
+        if (r.pos[0] > 20 + cfg.ROOMBA_RADIUS):
+            reward = 1
+
+        return (has_left, reward)
         

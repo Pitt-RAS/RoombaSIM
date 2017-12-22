@@ -17,11 +17,16 @@ TASKS = {
     'HoldPositionTask': HoldPositionTask,
     'XYZTranslationTask': XYZTranslationTask,
     'TakeoffTask': TakeoffTask,
-    'LandTask': LandTask
+    'GoToRoombaTask': GoToRoombaTask,
+    'TrackRoombaTask': TrackRoombaTask,
+    'HitRoombaTask': HitRoombaTask,
+    'LandTask': LandTask,
+    'BlockRoombaTask': BlockRoombaTask
 }
 
 STATES = {
-    'DroneState': DroneState
+    'DroneState': DroneState,
+    'RoombaState': RoombaState
 }
 
 RENDER_AGENT = render.render_pittrasdrone
@@ -71,11 +76,24 @@ PITTRAS_XYZ_TRANSLATION_ACCURACY = 0.2
 
 # PID constants for xy controller
 # [Kp,Kd,Ki]
-PITTRAS_PID_XY = np.array([0.5,1.1,0])
+PITTRAS_PID_XY = np.array([0.5, 1.1, 0])
 
 # PID constants for z controller
 # [Kp,Kd,Ki]
-PITTRAS_PID_Z = np.array([0.5,0,0])
+PITTRAS_PID_Z = np.array([0.9, 0, 0])
+
+# PID constants for yaw controller
+# [Kp,Kd,Ki]
+PITTRAS_PID_YAW = np.array([0.5, 0, 0])
+
+# hover height while tracking roomba in meters
+PITTRAS_TRACK_ROOMBA_HEIGHT = 1
+
+# minimum distance to allow hit roomba task to run in meters
+PITTRAS_HIT_ROOMBA_MAX_START_DIST = 0.5
+
+# descent velocity for hit roomba task
+PITTRAS_HIT_DESCENT_VELOCITY = -0.2
 
 # Tolerance for distance comparasion in the HoldPositionTask
 PITTRAS_HOLD_POSITION_TOLERANCE = 0.2

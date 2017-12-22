@@ -26,7 +26,7 @@ class Roomba(object):
     (No update function)
     '''
 
-    def __init__(self, pos, heading, tag=''):
+    def __init__(self, pos, heading, tag=None):
         '''
         Initialize a roomba object with a given position and heading.
         By default, the roomba starts in STATE_IDLE.
@@ -134,6 +134,9 @@ class TargetRoomba(Roomba):
                 self.heading -= amount
             else:
                 self.heading += amount
+
+            # mod to 2 pi
+            self.heading %= cfg.TAU
             
             if self.turn_target < 0:
                 # we have completed the turn, reset to forward motion

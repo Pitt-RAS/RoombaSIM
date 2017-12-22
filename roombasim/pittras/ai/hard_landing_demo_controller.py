@@ -1,22 +1,16 @@
 '''
-hold_position_demo_controller.py
+hard_landing_demo_controller.py
 '''
 
 from roombasim.ai import Controller
 
-def hold_position_task_completion_callback(status, message):
+class HardLandingDemoController(Controller):
     '''
-    Callback for Hold Position task completion.
-    '''
-    print("Hold Position task completed with", status)
-
-class HoldPositionDemoController(Controller):
-    '''
-    A demo controller tests HoldPositionTask.
+    A demonstration of controlled landing while in motion.
     '''
 
     def setup(self):
-        self.holding = False
+        self.landing = False
 
         # set the initial target
         print('Initiating takeoff...')
@@ -33,12 +27,14 @@ class HoldPositionDemoController(Controller):
             callback = (lambda a,b: self.move())
         )
 
+    def complete(self):
+        print('Landed')
+
     def update(self, delta, elapsed, environment):
-        if elapsed > 7000 and self.holding == False:
-            print('Hold position')
-            self.holding = True
+        if elapsed > 7000 and self.landing == False:
+            print('Land!')
+            self.landing = True
             self.task_controller.switch_task(
-                'HoldPositionTask',
-                hold_duration=5,
-                callback=hold_position_task_completion_callback
+                'LandTask',
+                callback=(lambda a,b: self.complete())
             )

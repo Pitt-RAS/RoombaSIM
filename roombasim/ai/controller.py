@@ -25,7 +25,7 @@ class Controller(object):
         update the controller as well as propogate task updates to
         the environment.
         '''
-        self.update(delta, elapsed)
+        self.update(delta, elapsed, environment)
         self.task_controller.update(delta, elapsed, self.state_controller, environment)
 
     def setup(self):
@@ -34,7 +34,7 @@ class Controller(object):
         '''
         pass
 
-    def update(self, delta, elapsed):
+    def update(self, delta, elapsed, environment):
         '''
         Subclasses should override this method to perform AI decision making.
         '''
