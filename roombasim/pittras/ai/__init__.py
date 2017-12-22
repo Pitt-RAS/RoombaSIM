@@ -10,3 +10,4 @@ from .hit_roomba_demo_controller import HitRoombaDemoController
 from .land_demo_controller import LandDemoController
 from .hold_position_demo_controller import HoldPositionDemoController
 from .hard_landing_demo_controller import HardLandingDemoController
+from .velocity_demo_controller import VelocityDemoController
