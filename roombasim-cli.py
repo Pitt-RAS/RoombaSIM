@@ -25,6 +25,7 @@ def main():
                                    type=float,
                                    nargs=3,
                                    default=[1.5, 1.5, 0.0])
+    controller_parser.add_argument('-timescale', type=float)
 
     demo_parser = subparsers.add_parser('demo')
     demo_parser.add_argument('-num_targets', type=int, choices=range(1,25))
@@ -99,7 +100,10 @@ def run_controller(args):
     environment.agent = agent
 
     # create window so the keyboard can access it
-    window = Display(environment)
+    if args.timescale:
+        window = Display(environment, args.timescale)
+    else:
+        window = Display(environment)
 
     def update_func(delta, elapsed):
         environment.update(delta, elapsed)
