@@ -7,6 +7,7 @@ from .callback_waypoint_demo_controller import CallbackWaypointDemoController
 from .takeoff_demo_controller import TakeoffDemoController
 from .track_roomba_demo_controller import TrackRoombaDemoController
 from .hit_roomba_demo_controller import HitRoombaDemoController
+from .block_roomba_demo_controller import BlockRoombaDemoController
 from .land_demo_controller import LandDemoController
 from .hold_position_demo_controller import HoldPositionDemoController
 from .hard_landing_demo_controller import HardLandingDemoController

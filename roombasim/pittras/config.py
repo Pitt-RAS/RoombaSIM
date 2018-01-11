@@ -100,6 +100,8 @@ PITTRAS_HIT_ROOMBA_MAX_START_DIST = 0.5
 # descent velocity for hit roomba task
 PITTRAS_HIT_DESCENT_VELOCITY = -0.2
 
+PITTRAS_BLOCK_DESCENT_VEL = -0.3
+
 # Tolerance for distance comparasion in the HoldPositionTask
 PITTRAS_HOLD_POSITION_TOLERANCE = 0.2
 
