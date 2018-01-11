@@ -153,7 +153,7 @@ class Environment(object):
             0 otherwise
         '''
         has_left = False
-        reward = 0
+        reward = -1000
 
         if (r.pos[0] < -cfg.ROOMBA_RADIUS
             or r.pos[1] < -cfg.ROOMBA_RADIUS
@@ -162,7 +162,7 @@ class Environment(object):
             has_left = True
 
         if (r.pos[0] > 20 + cfg.ROOMBA_RADIUS):
-            reward = 1
+            reward = 2000
 
         return (has_left, reward)
 
