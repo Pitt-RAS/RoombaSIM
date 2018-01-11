@@ -81,6 +81,12 @@ class Display(pyglet.window.Window):
                                          'left'
                                          if button == pyglet.window.mouse.LEFT
                                          else 'right')
+                    break
+        else:
+            self._click_callback((x, y),
+                                 'left'
+                                 if button == pyglet.window.mouse.LEFT
+                                 else 'right')
 
     @staticmethod
     def _draw_target_roomba(r):
