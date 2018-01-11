@@ -23,6 +23,8 @@ class BlockRoombaTask(Task):
         self.target_roomba = target_roomba
         self.block_vector = np.array(block_vector)
 
+        self.land_time = None
+
         # calculated on first update
         self.target_yaw = None
         self.target_xy = None
@@ -37,6 +39,14 @@ class BlockRoombaTask(Task):
 
         # fetch drone odometry
         drone_state = state_controller.query('DroneState', environment)
+
+        if self.land_time is not None:
+            if elapsed - self.land_time > cfg.PITTRAS_BLOCK_FLOOR_TIME * 1000:
+                self.complete(TaskState.SUCCESS)
+            return
+
+        if drone_state['z_pos'] == 0:
+            self.land_time = elapsed
 
         if not self.target_roomba in target_roombas:
             self.complete(TaskState.FAILURE, "Roomba not found")
