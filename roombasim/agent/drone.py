@@ -99,10 +99,6 @@ class Drone(object):
         '''
         Perform a physics update step.
         '''
-        # update yaw
-        self.yaw += self.yaw_vel * delta
-        self.yaw %= (np.pi * 2)
-
         # update height
         self.z_pos += self.z_vel * delta
 
@@ -110,23 +106,28 @@ class Drone(object):
         if self.z_pos <= 0:
             self.z_pos = 0
             self.z_vel = 0
+            self.xy_vel = np.array((0.0, 0.0))
+        else:
+            # update yaw
+            self.yaw += self.yaw_vel * delta
+            self.yaw %= (np.pi * 2)
 
-        # update position
+            # update position
 
-        # rotate the acceleration vector about the origin by
-        # the current yaw and apply it to the velocity vector
-        rot_matrix = np.array([
-            [np.cos(self.yaw), -np.sin(self.yaw)],
-            [np.sin(self.yaw), np.cos(self.yaw)]
-        ])
+            # rotate the acceleration vector about the origin by
+            # the current yaw and apply it to the velocity vector
+            rot_matrix = np.array([
+                [np.cos(self.yaw), -np.sin(self.yaw)],
+                [np.sin(self.yaw), np.cos(self.yaw)]
+            ])
 
-        self._frame_accel = rot_matrix.dot(self.xy_accel)
+            self._frame_accel = rot_matrix.dot(self.xy_accel)
 
-        self.xy_vel += self._frame_accel * delta
-        if np.linalg.norm(self.xy_vel) > cfg.DRONE_MAX_HORIZ_VELOCITY:
-            self.xy_vel *= (cfg.DRONE_MAX_HORIZ_VELOCITY
-                          / np.linalg.norm(self.xy_vel))
-        self.xy_pos += self.xy_vel * delta
+            self.xy_vel += self._frame_accel * delta
+            if np.linalg.norm(self.xy_vel) > cfg.DRONE_MAX_HORIZ_VELOCITY:
+                self.xy_vel *= (cfg.DRONE_MAX_HORIZ_VELOCITY
+                              / np.linalg.norm(self.xy_vel))
+            self.xy_pos += self.xy_vel * delta
 
     # The following functions should be implemented by
     # a team-specific subclass:
