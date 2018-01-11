@@ -24,15 +24,16 @@ from roombasim import geometry
 
 class Display(pyglet.window.Window):
 
-    def __init__(self, environment, self_update=True):
+    def __init__(self, environment, timescale=1.0, self_update=True):
         super(Display, self).__init__(700,700)
 
+        self._timescale = timescale
         self.update_func = (lambda a,b:0)
         self._click_callback = (lambda a,b:None)
 
         if self_update:
-            pyglet.clock.schedule_interval(self._update, 1.0/60.0)
-            pyglet.clock.set_fps_limit(60)
+            pyglet.clock.schedule_interval(self._update, 1.0/self._timescale/60.0)
+            pyglet.clock.set_fps_limit(self._timescale*60)
 
         self.environment = environment
         self.start_time = time.time()
@@ -44,7 +45,8 @@ class Display(pyglet.window.Window):
         self.update_func = update_func
 
     def _update(self, dt):
-        self.update_func(dt, (time.time() - self.start_time) * 1000)
+        self.update_func(self._timescale*dt,
+                         self._timescale * (time.time() - self.start_time) * 1000)
 
     def on_resize(self, width, height):
         glViewport(10, 10, width-20, height-20)

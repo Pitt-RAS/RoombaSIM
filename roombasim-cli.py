@@ -31,6 +31,7 @@ def main():
     demo_parser.add_argument('-num_obstacles', type=int, choices=range(1,11))
     demo_parser.add_argument('-target_spawn_radius', type=float)
     demo_parser.add_argument('-obstacle_spawn_radius', type=float)
+    demo_parser.add_argument('-timescale', type=float)
 
     speedtest_parser = subparsers.add_parser('speedtest')
     speedtest_parser.add_argument('-frames', type=int, default=1000)
@@ -139,7 +140,10 @@ def run_demo(args):
     environment.agent = agent
 
     config = pyglet.gl.Config(sample_buffers=1, samples=4)
-    window = Display(environment)
+    if args.timescale:
+        window = Display(environment, args.timescale)
+    else:
+        window = Display(environment)
 
     def update_func(delta, elapsed):
         environment.update(delta, elapsed)
