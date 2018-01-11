@@ -105,4 +105,4 @@ MISSION_OBSTACLE_SPAWN_RADIUS = 4
 # how many vertices to use to draw circles
 # (note: hopefully someone can implement fragment shaders
 # and this will become irrelevant)
-GRAPHICS_CIRCLE_VERTICES = 100
+GRAPHICS_CIRCLE_VERTICES = 10
