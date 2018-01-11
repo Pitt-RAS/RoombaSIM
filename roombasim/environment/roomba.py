@@ -147,7 +147,7 @@ class TargetRoomba(Roomba):
                 self.heading += self.angular_noise_velocity * delta
                 self.pos[0] += cfg.ROOMBA_LINEAR_SPEED * np.cos(self.heading) * delta
                 self.pos[1] += cfg.ROOMBA_LINEAR_SPEED * np.sin(self.heading) * delta
-        else:
+        elif self.state != cfg.ROOMBA_STATE_IDLE:
             assert False
 
 class ObstacleRoomba(Roomba):
