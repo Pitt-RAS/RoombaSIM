@@ -28,6 +28,7 @@ class Display(pyglet.window.Window):
         super(Display, self).__init__(700,700)
 
         self.update_func = (lambda a,b:0)
+        self._click_callback = (lambda a,b:None)
 
         if self_update:
             pyglet.clock.schedule_interval(self._update, 1.0/60.0)
@@ -35,6 +36,9 @@ class Display(pyglet.window.Window):
 
         self.environment = environment
         self.start_time = time.time()
+
+    def set_click_callback(self, callback):
+        self._click_callback = callback
 
     def set_update_func(self, update_func):
         self.update_func = update_func
@@ -64,6 +68,17 @@ class Display(pyglet.window.Window):
                 Display._draw_obstacle_roomba(r)
 
         Display._draw_drone(self.environment.agent)
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        x *= 20.0 / self.get_size()[0]
+        y *= 20.0 / self.get_size()[1]
+        for r in self.environment.roombas:
+            if isinstance(r, roomba.TargetRoomba):
+                if np.hypot(x - r.pos[0], y - r.pos[1]) < cfg.ROOMBA_RADIUS:
+                    self._click_callback(r,
+                                         'left'
+                                         if button == pyglet.window.mouse.LEFT
+                                         else 'right')
 
     @staticmethod
     def _draw_target_roomba(r):

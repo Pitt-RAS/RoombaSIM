@@ -17,6 +17,7 @@ Behavior:
 '''
 
 import numpy as np
+import random
 
 import roombasim.config as cfg
 
@@ -46,7 +47,8 @@ class Roomba(object):
 
         self.timers = {
             'reverse': 0,
-            'noise': 0
+            'noise': 0,
+            'touch': 0
         }
 
         self.state = cfg.ROOMBA_STATE_IDLE
@@ -89,59 +91,64 @@ class TargetRoomba(Roomba):
         delta - change in time since last update (seconds)
         elapsed - total time elapsed since start (milliseconds)
         '''
-        # check for collisions
-        if self.collisions['top']:
-            self.collisions['top'] = False
-
-            if self.state == cfg.ROOMBA_STATE_FORWARD:
-                self.state = cfg.ROOMBA_STATE_TURNING
-                self.turn_target = (np.pi / 4)
-                self.turn_clockwise = True
-
-        if self.collisions['front']:
-            self.collisions['front'] = False
-
-            if self.state == cfg.ROOMBA_STATE_FORWARD:
-                self.state = cfg.ROOMBA_STATE_TURNING
-                self.turn_target = np.pi
-                self.turn_clockwise = True
-
-        # update linear or angular motion
         if self.state == cfg.ROOMBA_STATE_FORWARD:
-            self.pos[0] += cfg.ROOMBA_LINEAR_SPEED * np.cos(self.heading) * delta
-            self.pos[1] += cfg.ROOMBA_LINEAR_SPEED * np.sin(self.heading) * delta
-
-            # check full turn period
-            if elapsed - self.timers['reverse'] > cfg.ROOMBA_REVERSE_PERIOD:
+            if self.collisions['top']:
+                self.state = cfg.ROOMBA_STATE_TOUCHED
+                self.collisions['top'] = False
+                self.timers['touch'] = elapsed
+            elif elapsed - self.timers['reverse'] > cfg.ROOMBA_REVERSE_PERIOD:
+                self.state = cfg.ROOMBA_STATE_REVERSING
                 self.timers['reverse'] = elapsed
-                self.state = cfg.ROOMBA_STATE_TURNING
-                self.turn_target = np.pi
-                self.turn_clockwise = True
-
-            # check random noise period
-            if elapsed - self.timers['noise'] > cfg.ROOMBA_HEADING_NOISE_PERIOD:
+            elif elapsed - self.timers['noise'] > cfg.ROOMBA_HEADING_NOISE_PERIOD:
+                self.state = cfg.ROOMBA_STATE_TURNING_NOISE
+                self.angular_noise_velocity = (random.uniform(-cfg.ROOMBA_HEADING_NOISE_MAX,
+                                                              cfg.ROOMBA_HEADING_NOISE_MAX)
+                                             / (cfg.ROOMBA_NOISE_DURATION / 1000.0))
                 self.timers['noise'] = elapsed
-                self.state = cfg.ROOMBA_STATE_TURNING
-                self.turn_target = np.random.rand() * cfg.ROOMBA_HEADING_NOISE_MAX
-                self.turn_clockwise = (np.random.rand() > 0.5)
-
-        elif self.state == cfg.ROOMBA_STATE_TURNING:
-            amount = cfg.ROOMBA_ANGULAR_SPEED * delta
-
-            self.turn_target -= amount
-
-            if self.turn_clockwise:
-                self.heading -= amount
+            elif self.collisions['front']:
+                self.collisions['front'] = False
+                self.state = cfg.ROOMBA_STATE_REVERSING
+                self.timers['reverse'] = elapsed
             else:
-                self.heading += amount
-
-            # mod to 2 pi
-            self.heading %= cfg.TAU
-            
-            if self.turn_target < 0:
-                # we have completed the turn, reset to forward motion
+                self.pos[0] += cfg.ROOMBA_LINEAR_SPEED * np.cos(self.heading) * delta
+                self.pos[1] += cfg.ROOMBA_LINEAR_SPEED * np.sin(self.heading) * delta
+        elif self.state == cfg.ROOMBA_STATE_TOUCHED:
+            turn_time = (np.pi / 4) / cfg.ROOMBA_ANGULAR_SPEED
+            if elapsed - self.timers['touch'] >= turn_time * 1000:
                 self.state = cfg.ROOMBA_STATE_FORWARD
-
+            elif self.collisions['front']:
+                self.state = cfg.ROOMBA_STATE_REVERSING
+                self.collisions['front'] = False
+                self.timers['reverse'] = elapsed
+            else:
+                self.heading -= cfg.ROOMBA_ANGULAR_SPEED * delta
+        elif self.state == cfg.ROOMBA_STATE_REVERSING:
+            if self.collisions['top']:
+                self.collisions['top'] = False
+                self.state = cfg.ROOMBA_STATE_TOUCHED
+                self.timers['touch'] = elapsed
+            elif elapsed - self.timers['reverse'] >= np.pi / cfg.ROOMBA_ANGULAR_SPEED * 1000:
+                self.state = cfg.ROOMBA_STATE_FORWARD
+            else:
+                self.heading -= cfg.ROOMBA_ANGULAR_SPEED * delta
+            self.collisions['front'] = False
+        elif self.state == cfg.ROOMBA_STATE_TURNING_NOISE:
+            if self.collisions['top']:
+                self.collisions['top'] = False
+                self.state = cfg.ROOMBA_STATE_TOUCHED
+                self.timers['touch'] = elapsed
+            elif elapsed - self.timers['noise'] >= cfg.ROOMBA_NOISE_DURATION:
+                self.state = cfg.ROOMBA_STATE_FORWARD
+            elif self.collisions['front']:
+                self.collisions['front'] = False
+                self.state = cfg.ROOMBA_STATE_REVERSING
+                self.timers['reverse'] = elapsed
+            else:
+                self.heading += self.angular_noise_velocity * delta
+                self.pos[0] += cfg.ROOMBA_LINEAR_SPEED * np.cos(self.heading) * delta
+                self.pos[1] += cfg.ROOMBA_LINEAR_SPEED * np.sin(self.heading) * delta
+        else:
+            assert False
 
 class ObstacleRoomba(Roomba):
     '''
@@ -166,6 +173,6 @@ class ObstacleRoomba(Roomba):
             self.pos[0] += cfg.ROOMBA_LINEAR_SPEED * np.cos(self.heading) * delta
             self.pos[1] += cfg.ROOMBA_LINEAR_SPEED * np.sin(self.heading) * delta
 
-            # reorient so we tangent to a circle centered at the origin 
+            # reorient so we tangent to a circle centered at the origin
             ang = np.arctan2(10 - self.pos[1], 10 - self.pos[0])
             self.heading = ang + (cfg.PI / 2)
