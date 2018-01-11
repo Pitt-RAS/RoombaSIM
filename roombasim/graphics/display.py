@@ -157,7 +157,7 @@ class Display(pyglet.window.Window):
             glEnd()
 
         # draw vertical lines
-        for x in range(0,21):
+        for x in range(1,20):
             if x % 5 == 0:
                 glColor3f(0.5,0.5,0.5)
             else:
@@ -167,6 +167,18 @@ class Display(pyglet.window.Window):
             glVertex2f(x,0)
             glVertex2f(x,20)
             glEnd()
+
+        glColor3f(0.5, 0.0, 0.0)
+        glBegin(GL_LINES)
+        glVertex2f(0, 0)
+        glVertex2f(0, 20)
+        glEnd()
+
+        glColor3f(0.0, 0.5, 0.0)
+        glBegin(GL_LINES)
+        glVertex2f(20, 0)
+        glVertex2f(20, 20)
+        glEnd()
 
     @staticmethod
     def _draw_hollow_circle(pos, radius):
