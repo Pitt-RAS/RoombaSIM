@@ -33,6 +33,10 @@ def load(module):
 # Defines the agent to initialize in the environment
 AGENT = None
 
+DRONE_MAX_VERTICAL_VELOCITY = float('Inf')
+DRONE_MAX_HORIZ_ACCEL = float('Inf')
+DRONE_MAX_HORIZ_VELOCITY = float('Inf')
+
 # (optional)
 # Defines a method to render the agent in the opengl
 # context. See roombasim.graphics.display for examples.

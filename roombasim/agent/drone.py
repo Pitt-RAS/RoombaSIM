@@ -4,6 +4,7 @@ drone.py
 Generic Drone implementation
 '''
 import numpy as np
+import roombasim.config as cfg
 
 class Drone(object):
     '''
@@ -83,8 +84,16 @@ class Drone(object):
         - z_vel : a value containing the target z velocity
         '''
         self.xy_accel = np.array(xy_accel, dtype=np.float64)
+        if np.linalg.norm(self.xy_accel) > cfg.DRONE_MAX_HORIZ_ACCEL:
+            self.xy_accel *= (cfg.DRONE_MAX_HORIZ_ACCEL
+                            / np.linalg.norm(self.xy_accel))
+
         self.yaw_vel = yaw_vel
+
         self.z_vel = z_vel
+        if np.abs(self.z_vel) > cfg.DRONE_MAX_VERTICAL_VELOCITY:
+            self.z_vel = np.copysign(cfg.DRONE_MAX_VERTICAL_VELOCITY,
+                                     self.z_vel)
 
     def update(self, delta, elapsed):
         '''
@@ -114,6 +123,9 @@ class Drone(object):
         self._frame_accel = rot_matrix.dot(self.xy_accel)
 
         self.xy_vel += self._frame_accel * delta
+        if np.linalg.norm(self.xy_vel) > cfg.DRONE_MAX_HORIZ_VELOCITY:
+            self.xy_vel *= (cfg.DRONE_MAX_HORIZ_VELOCITY
+                          / np.linalg.norm(self.xy_vel))
         self.xy_pos += self.xy_vel * delta
 
     # The following functions should be implemented by

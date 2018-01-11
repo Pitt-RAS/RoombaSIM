@@ -11,6 +11,10 @@ import numpy as np
 #
 AGENT = PittRASDrone
 
+DRONE_MAX_VERTICAL_VELOCITY = 1.0
+DRONE_MAX_HORIZ_ACCEL = 3.0
+DRONE_MAX_HORIZ_VELOCITY = 1.0
+
 CONTROLLER = WaypointDemoController
 
 TASKS = {
