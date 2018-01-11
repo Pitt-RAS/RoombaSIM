@@ -30,6 +30,8 @@ class Display(pyglet.window.Window):
         self._timescale = timescale
         self.update_func = (lambda a,b:0)
         self._click_callback = (lambda a,b:None)
+        self._paused = False
+        self._elapsed = 0.0
 
         if self_update:
             pyglet.clock.schedule_interval(self._update, 1.0/self._timescale/60.0)
@@ -45,8 +47,9 @@ class Display(pyglet.window.Window):
         self.update_func = update_func
 
     def _update(self, dt):
-        self.update_func(self._timescale*dt,
-                         self._timescale * (time.time() - self.start_time) * 1000)
+        if not self._paused:
+            self._elapsed += dt * 1000
+            self.update_func(self._timescale*dt, self._timescale*self._elapsed)
 
     def on_resize(self, width, height):
         glViewport(10, 10, width-20, height-20)
@@ -87,6 +90,10 @@ class Display(pyglet.window.Window):
                                  'left'
                                  if button == pyglet.window.mouse.LEFT
                                  else 'right')
+
+    def on_key_release(self, symbol, modifiers):
+        if symbol == pyglet.window.key.SPACE:
+            self._paused = not self._paused
 
     @staticmethod
     def _draw_target_roomba(r):
