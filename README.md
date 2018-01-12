@@ -58,6 +58,16 @@ $ ./roombasim-cli.py run roombasim.pittras.config roombasim.pittras.ai.WaypointD
 
 This command will use default settings and create a window to preview the controller in real time.
 
+# Human Player
+
+To send actions to the drone manually, you can use the `human_player` script:
+
+```bash
+$ ./roombasim-cli.py human_player
+```
+
+Click anywhere to move the drone there, left click on a roomba to land on top, and right click to block.
+
 # Demo
 
 There are also a few demo controllers that can be run using different commands.
@@ -72,6 +82,7 @@ Optional params:
     -num_obstacles
     -target_spawn_radius
     -obstacle_spawn_radius
+    -timescale
 ```
 
 For example:
