@@ -23,6 +23,8 @@ class HitRoombaTask(Task):
         # estimate roomba velocity
         self.last_target_xy = None
 
+        self.land_time = None
+
     def update(self, delta, elapsed, state_controller, environment):
         # fetch roomba odometry
         target_roombas, _ = state_controller.query('RoombaState', environment)
@@ -65,7 +67,10 @@ class HitRoombaTask(Task):
 
         # check if we have hit the roomba
         if drone_state['z_pos'] < cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT:
-            self.complete(TaskState.SUCCESS)
+            if self.land_time is None:
+                self.land_time = elapsed
+            if elapsed - self.land_time > cfg.PITTRAS_HIT_ROOMBA_FLOOR_TIME * 1000:
+                self.complete(TaskState.SUCCESS)
             return
 
         # update delayed trackers
