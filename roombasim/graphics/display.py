@@ -72,7 +72,11 @@ class Display(pyglet.window.Window):
 
         for r in self.environment.roombas:
             if isinstance(r, roomba.TargetRoomba):
-                Display._draw_target_roomba(r)
+                if self.environment.target_roomba == r.tag:
+                    Display._draw_target_roomba(r,
+                                                self.environment.target_type)
+                else:
+                    Display._draw_target_roomba(r)
             else:
                 Display._draw_obstacle_roomba(r)
 
@@ -100,7 +104,7 @@ class Display(pyglet.window.Window):
             self._paused = not self._paused
 
     @staticmethod
-    def _draw_target_roomba(r):
+    def _draw_target_roomba(r, special_state=None):
         pos = r.pos
         heading = r.heading
         vertex_count = cfg.GRAPHICS_CIRCLE_VERTICES
@@ -111,9 +115,15 @@ class Display(pyglet.window.Window):
         glHint(GL_LINE_SMOOTH_HINT,GL_NICEST)
 
         # Outline
-        if r.state == cfg.ROOMBA_STATE_FORWARD or True:
+        if special_state == 'hitting':
+            glColor3f(0.7, 0.7, 1.0)
+        elif special_state == 'blocking':
+            glColor3f(0.7, 1.0, 0.7)
+        elif r.state == cfg.ROOMBA_STATE_FORWARD:
             glColor3f(1,1,1)
-        elif r.state == cfg.ROOMBA_STATE_TURNING:
+        elif r.state in (cfg.ROOMBA_STATE_TURNING_NOISE,
+                         cfg.ROOMBA_STATE_REVERSING,
+                         cfg.ROOMBA_STATE_TOUCHED):
             glColor3f(1,0.8,0.8)
 
         Display._draw_hollow_circle(pos, radius)
@@ -210,7 +220,7 @@ class Display(pyglet.window.Window):
         for i in range(cfg.GRAPHICS_CIRCLE_VERTICES):
             theta = (2 * np.pi * i) / cfg.GRAPHICS_CIRCLE_VERTICES
             glVertex2f(
-                (np.cos(theta) * radius + pos[0]), 
+                (np.cos(theta) * radius + pos[0]),
                 (np.sin(theta) * radius + pos[1])
             )
 

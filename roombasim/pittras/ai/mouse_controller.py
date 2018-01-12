@@ -5,6 +5,9 @@ mouse_controller.py
 from roombasim.ai import Controller
 from roombasim.environment.roomba import TargetRoomba
 
+class DummyEnvironment(object):
+    pass
+
 class MouseController(Controller):
     '''
     A controller that lets the user control the drone with the mouse
@@ -14,10 +17,22 @@ class MouseController(Controller):
         self.task_id = 0
         self.task_controller.switch_task('TakeoffTask')
 
+        self.environment = DummyEnvironment()
+        self.environment.target_roomba = None
+        self.environment.target_type = None
+
+    def update(self, delta, elapsed, environment):
+        if isinstance(self.environment, DummyEnvironment):
+            environment.target_roomba = self.environment.target_roomba
+            environment.target_type = self.environment.target_type
+        self.environment = environment
+
     def mouse_callback(self, obj_clicked, button):
         self.task_id += 1
         if isinstance(obj_clicked, TargetRoomba):
             if button == 'left':
+                self.environment.target_roomba = obj_clicked.tag
+                self.environment.target_type = 'hitting'
                 self.task_controller.switch_task(
                     'GoToRoombaTask',
                     target_roomba=obj_clicked.tag,
@@ -32,8 +47,14 @@ class MouseController(Controller):
                                     callback=self.task_callback(
                                         lambda : self.task_controller.switch_task(
                                             'HoldPositionTask',
-                                            hold_duration=0)))))))
+                                            hold_duration=0)
+                                            or
+                                            setattr(self.environment,
+                                                    'target_roomba',
+                                                    None)))))))
             else:
+                self.environment.target_roomba = obj_clicked.tag
+                self.environment.target_type = 'blocking'
                 self.task_controller.switch_task(
                     'GoToRoombaTask',
                     target_roomba=obj_clicked.tag,
@@ -49,8 +70,13 @@ class MouseController(Controller):
                                     callback=self.task_callback(
                                         lambda : self.task_controller.switch_task(
                                             'HoldPositionTask',
-                                            hold_duration=0)))))))
+                                            hold_duration=0)
+                                            or
+                                            setattr(self.environment,
+                                                    'target_roomba',
+                                                    None)))))))
         else:
+            self.environment.target_roomba = None
             self.task_controller.switch_task(
                     'XYZTranslationTask',
                     target=(obj_clicked[0], obj_clicked[1], 1.0),

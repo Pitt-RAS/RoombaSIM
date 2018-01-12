@@ -30,6 +30,8 @@ class Environment(object):
         self.good_exits = 0
         self.bad_exits = 0
         self.score = 0
+        self.target_roomba = None
+        self.target_type = None
 
     def reset(self):
         '''
@@ -48,6 +50,8 @@ class Environment(object):
         self.good_exits = 0
         self.bad_exits = 0
         self.score = 0
+        self.target_roomba = None
+        self.target_type = None
 
         # spawn target roombas
         for i in range(cfg.MISSION_NUM_TARGETS):
