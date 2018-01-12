@@ -113,6 +113,7 @@ class TargetRoomba(Roomba):
                 self.pos[0] += cfg.ROOMBA_LINEAR_SPEED * np.cos(self.heading) * delta
                 self.pos[1] += cfg.ROOMBA_LINEAR_SPEED * np.sin(self.heading) * delta
         elif self.state == cfg.ROOMBA_STATE_TOUCHED:
+            self.collisions['top'] = False #TODO: Is this right?
             turn_time = (np.pi / 4) / cfg.ROOMBA_ANGULAR_SPEED
             if elapsed - self.timers['touch'] >= turn_time * 1000:
                 self.state = cfg.ROOMBA_STATE_FORWARD
@@ -123,6 +124,7 @@ class TargetRoomba(Roomba):
             else:
                 self.heading -= cfg.ROOMBA_ANGULAR_SPEED * delta
         elif self.state == cfg.ROOMBA_STATE_REVERSING:
+            self.collisions['front'] = False #TODO: Is this right?
             if self.collisions['top']:
                 self.collisions['top'] = False
                 self.state = cfg.ROOMBA_STATE_TOUCHED
