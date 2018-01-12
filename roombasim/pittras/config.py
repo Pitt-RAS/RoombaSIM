@@ -64,7 +64,7 @@ PITTRAS_TAKEOFF_VELOCITY = 0.3
 PITTRAS_TAKEOFF_COMPLETE_HEIGHT = 0.7
 
 # delay between arming and taking off
-PITTRAS_DELAY_BEFORE_TAKEOFF = 2.0
+PITTRAS_DELAY_BEFORE_TAKEOFF = 0.0
 
 # altitude when we transition from acro to angle mode
 PITTRAS_TAKEOFF_ANGLE_MODE_HEIGHT = 0.2
