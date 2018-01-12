@@ -27,6 +27,9 @@ class Environment(object):
     def __init__(self):
         self.roombas = []
         self.agent = None
+        self.good_exits = 0
+        self.bad_exits = 0
+        self.score = 0
 
     def reset(self):
         '''
@@ -42,6 +45,9 @@ class Environment(object):
         '''
         self.roombas = []
         self.agent = None
+        self.good_exits = 0
+        self.bad_exits = 0
+        self.score = 0
 
         # spawn target roombas
         for i in range(cfg.MISSION_NUM_TARGETS):
@@ -113,6 +119,11 @@ class Environment(object):
             (has_left, reward) = Environment._check_bounds(rba)
             if has_left:
                 print('roomba left, reward: ' + str(reward))
+                if reward > 0:
+                    self.good_exits += 1
+                else:
+                    self.bad_exits += 1
+                self.score += reward
                 rba.stop()
 
         # update the drone

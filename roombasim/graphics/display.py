@@ -66,6 +66,10 @@ class Display(pyglet.window.Window):
 
         Display._draw_gridlines()
 
+        self._draw_score(self.environment.good_exits,
+                         self.environment.bad_exits,
+                         self.environment.score)
+
         for r in self.environment.roombas:
             if isinstance(r, roomba.TargetRoomba):
                 Display._draw_target_roomba(r)
@@ -148,11 +152,17 @@ class Display(pyglet.window.Window):
         glVertex2f(np.cos(heading) * radius + pos[0], np.sin(heading) * radius + pos[1])
 
         glEnd()
-    
+
     @staticmethod
     def _draw_drone(drone):
         if cfg.RENDER_AGENT != None:
             cfg.RENDER_AGENT(drone)
+
+    def _draw_score(self, good, bad, score):
+        self.set_caption(
+                'Good exits: {}   Bad exits: {}   Score: {}'.format(good,
+                                                                    bad,
+                                                                    score))
 
     @staticmethod
     def _draw_gridlines():
