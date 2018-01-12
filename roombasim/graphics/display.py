@@ -66,9 +66,10 @@ class Display(pyglet.window.Window):
 
         Display._draw_gridlines()
 
-        self._draw_score(self.environment.good_exits,
-                         self.environment.bad_exits,
-                         self.environment.score)
+        self._draw_header(self.environment.good_exits,
+                          self.environment.bad_exits,
+                          self.environment.score,
+                          int(self._elapsed / 1000))
 
         for r in self.environment.roombas:
             if isinstance(r, roomba.TargetRoomba):
@@ -168,11 +169,16 @@ class Display(pyglet.window.Window):
         if cfg.RENDER_AGENT != None:
             cfg.RENDER_AGENT(drone)
 
-    def _draw_score(self, good, bad, score):
+    def _draw_header(self, good, bad, score, elapsed_secs):
+        mins = elapsed_secs // 60
+        secs = elapsed_secs % 60
         self.set_caption(
-                'Good exits: {}   Bad exits: {}   Score: {}'.format(good,
-                                                                    bad,
-                                                                    score))
+            'Time: %02d:%02d  Good exits: %d   Bad exits: %d   Score: %d'%(
+                mins,
+                secs,
+                good,
+                bad,
+                score))
 
     @staticmethod
     def _draw_gridlines():
