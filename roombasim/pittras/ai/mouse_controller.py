@@ -58,12 +58,12 @@ class MouseController(Controller):
                 self.task_controller.switch_task(
                     'GoToRoombaTask',
                     target_roomba=obj_clicked.tag,
-                    offset_xy=(0.0, 0.0),
+                    offset_xy=(1.2, 0.0),
                     callback=self.task_callback(
                         lambda : self.task_controller.switch_task(
                             'BlockRoombaTask',
                             target_roomba=obj_clicked.tag,
-                            block_vector=(1.5, 0.0),
+                            block_vector=(1.2, 0.0),
                             callback=self.task_callback(
                                 lambda : self.task_controller.switch_task(
                                     'TakeoffTask',
