@@ -84,8 +84,8 @@ class Display(pyglet.window.Window):
         Display._draw_drone(self.environment.agent)
 
     def on_mouse_release(self, x, y, button, modifiers):
-        x *= 20.0 / self.get_size()[0]
-        y *= 20.0 / self.get_size()[1]
+        x = (x - 10) * 20.0 / (self.get_size()[0] - 20.0)
+        y = (y - 10) * 20.0 / (self.get_size()[1] - 20.0)
         for r in self.environment.roombas:
             if isinstance(r, roomba.TargetRoomba):
                 if np.hypot(x - r.pos[0], y - r.pos[1]) < cfg.ROOMBA_RADIUS:
