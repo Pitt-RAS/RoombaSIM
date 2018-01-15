@@ -113,4 +113,4 @@ class IdleTask(Task):
     '''
     def update(self, delta, elapsed, state_controller, environment):
         pass
-        
+

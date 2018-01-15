@@ -19,10 +19,11 @@ class HitRoombaTask(Task):
 
         # PID controllers
         self.pid_xy = PIDController(cfg.PITTRAS_PID_XY, dimensions=2)
-        self.pid_z = PIDController(cfg.PITTRAS_PID_Z)
 
         # estimate roomba velocity
         self.last_target_xy = None
+
+        self.land_time = None
 
     def update(self, delta, elapsed, state_controller, environment):
         # fetch roomba odometry
@@ -56,21 +57,20 @@ class HitRoombaTask(Task):
             delta
         )
 
-        control_z = self.pid_z.get_control(
-            -drone_state['z_pos'],
-            -drone_state['z_vel'],
-            delta
-        )
-
         # normalize acceleration vector
         adjusted_xy = geometry.rotate_vector(control_xy, -drone_state['yaw'])
 
         # perform control action
-        environment.agent.control(adjusted_xy, 0, control_z)
+        environment.agent.control(adjusted_xy,
+                                  0,
+                                  cfg.PITTRAS_HIT_ROOMBA_DESCENT_VELOCITY)
 
         # check if we have hit the roomba
         if drone_state['z_pos'] < cfg.PITTRAS_DRONE_PAD_ACTIVIATION_HEIGHT:
-            self.complete(TaskState.SUCCESS)
+            if self.land_time is None:
+                self.land_time = elapsed
+            if elapsed - self.land_time > cfg.PITTRAS_HIT_ROOMBA_FLOOR_TIME * 1000:
+                self.complete(TaskState.SUCCESS)
             return
 
         # update delayed trackers

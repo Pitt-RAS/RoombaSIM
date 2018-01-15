@@ -27,6 +27,11 @@ class Environment(object):
     def __init__(self):
         self.roombas = []
         self.agent = None
+        self.good_exits = 0
+        self.bad_exits = 0
+        self.score = 0
+        self.target_roomba = None
+        self.target_type = None
 
     def reset(self):
         '''
@@ -42,6 +47,11 @@ class Environment(object):
         '''
         self.roombas = []
         self.agent = None
+        self.good_exits = 0
+        self.bad_exits = 0
+        self.score = 0
+        self.target_roomba = None
+        self.target_type = None
 
         # spawn target roombas
         for i in range(cfg.MISSION_NUM_TARGETS):
@@ -70,7 +80,7 @@ class Environment(object):
             obstacle_roomba.start()
 
             self.roombas.append(obstacle_roomba)
-        
+
     def update(self, delta, elapsed):
         '''
         Perform an update step.
@@ -113,8 +123,13 @@ class Environment(object):
             (has_left, reward) = Environment._check_bounds(rba)
             if has_left:
                 print('roomba left, reward: ' + str(reward))
+                if reward > 0:
+                    self.good_exits += 1
+                else:
+                    self.bad_exits += 1
+                self.score += reward
                 rba.stop()
-        
+
         # update the drone
         self.agent.update(delta, elapsed)
 
@@ -135,12 +150,12 @@ class Environment(object):
         Returns true if roomba ra is facing the point pos.
 
         This works by determining the angle of the vector
-        ra -> pos relative to the +x axis and checking if the 
+        ra -> pos relative to the +x axis and checking if the
         heading of ra is within pi/2 radians of that result.
         '''
         ang = np.arctan2(pos[1] - ra.pos[1], pos[0] - ra.pos[0])
         return geometry.compare_angle(ra.heading, ang) < cfg.PI / 2
-    
+
     @staticmethod
     def _check_bounds(r):
         '''
@@ -153,16 +168,16 @@ class Environment(object):
             0 otherwise
         '''
         has_left = False
-        reward = 0
+        reward = -1000
 
-        if (r.pos[0] < -cfg.ROOMBA_RADIUS 
-            or r.pos[1] < -cfg.ROOMBA_RADIUS 
-            or r.pos[0] > 20 + cfg.ROOMBA_RADIUS 
+        if (r.pos[0] < -cfg.ROOMBA_RADIUS
+            or r.pos[1] < -cfg.ROOMBA_RADIUS
+            or r.pos[0] > 20 + cfg.ROOMBA_RADIUS
             or r.pos[1] > 20 + cfg.ROOMBA_RADIUS):
             has_left = True
 
         if (r.pos[0] > 20 + cfg.ROOMBA_RADIUS):
-            reward = 1
+            reward = 2000
 
         return (has_left, reward)
-        
+

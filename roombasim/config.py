@@ -33,6 +33,10 @@ def load(module):
 # Defines the agent to initialize in the environment
 AGENT = None
 
+DRONE_MAX_VERTICAL_VELOCITY = float('Inf')
+DRONE_MAX_HORIZ_ACCEL = float('Inf')
+DRONE_MAX_HORIZ_VELOCITY = float('Inf')
+
 # (optional)
 # Defines a method to render the agent in the opengl
 # context. See roombasim.graphics.display for examples.
@@ -65,10 +69,15 @@ ROOMBA_HEADING_NOISE_PERIOD = 5000
 # Maximum heading noise (applied in either direction) in radians
 ROOMBA_HEADING_NOISE_MAX = 20 * (np.pi / 180)
 
+# Time spent doing noisy turns (milliseconds)
+ROOMBA_NOISE_DURATION = 850
+
 # Python doesn't have enums...
 ROOMBA_STATE_IDLE = 0
 ROOMBA_STATE_FORWARD = 1
-ROOMBA_STATE_TURNING = 2
+ROOMBA_STATE_TOUCHED = 2
+ROOMBA_STATE_REVERSING = 3
+ROOMBA_STATE_TURNING_NOISE = 4
 
 # Roomba's radius in meters
 ROOMBA_RADIUS = 0.35 / 2
@@ -87,7 +96,7 @@ MISSION_TARGET_SPAWN_RADIUS = 1
 MISSION_NUM_OBSTACLES = 4
 
 # radius to spawn obstacle roombas in meters
-MISSION_OBSTACLE_SPAWN_RADIUS = 4
+MISSION_OBSTACLE_SPAWN_RADIUS = 5
 
 #
 # GRAPHICS CONFIGURATION
@@ -96,4 +105,4 @@ MISSION_OBSTACLE_SPAWN_RADIUS = 4
 # how many vertices to use to draw circles
 # (note: hopefully someone can implement fragment shaders
 # and this will become irrelevant)
-GRAPHICS_CIRCLE_VERTICES = 100
+GRAPHICS_CIRCLE_VERTICES = 10

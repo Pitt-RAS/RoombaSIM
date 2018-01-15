@@ -25,17 +25,26 @@ def main():
                                    type=float,
                                    nargs=3,
                                    default=[1.5, 1.5, 0.0])
+    controller_parser.add_argument('-timescale', type=float)
 
     demo_parser = subparsers.add_parser('demo')
     demo_parser.add_argument('-num_targets', type=int, choices=range(1,25))
     demo_parser.add_argument('-num_obstacles', type=int, choices=range(1,11))
     demo_parser.add_argument('-target_spawn_radius', type=float)
     demo_parser.add_argument('-obstacle_spawn_radius', type=float)
+    demo_parser.add_argument('-timescale', type=float)
 
     speedtest_parser = subparsers.add_parser('speedtest')
     speedtest_parser.add_argument('-frames', type=int, default=1000)
 
     keydemo_parser = subparsers.add_parser('keydemo')
+
+    hmi_parser = subparsers.add_parser('human_player')
+    hmi_parser.add_argument('-num_targets', type=int, choices=range(1,25))
+    hmi_parser.add_argument('-num_obstacles', type=int, choices=range(1,11))
+    hmi_parser.add_argument('-target_spawn_radius', type=float)
+    hmi_parser.add_argument('-obstacle_spawn_radius', type=float)
+    hmi_parser.add_argument('-timescale', type=float)
 
     args = parser.parse_args()
 
@@ -47,6 +56,8 @@ def main():
         speed_test(args)
     elif args.command == 'keydemo':
         keyboard_demo(args)
+    elif args.command == 'human_player':
+        human_player(args)
 
 
 def _load_class(cpath):
@@ -98,7 +109,10 @@ def run_controller(args):
     environment.agent = agent
 
     # create window so the keyboard can access it
-    window = Display(environment)
+    if args.timescale:
+        window = Display(environment, args.timescale)
+    else:
+        window = Display(environment)
 
     def update_func(delta, elapsed):
         environment.update(delta, elapsed)
@@ -139,7 +153,10 @@ def run_demo(args):
     environment.agent = agent
 
     config = pyglet.gl.Config(sample_buffers=1, samples=4)
-    window = Display(environment)
+    if args.timescale:
+        window = Display(environment, args.timescale)
+    else:
+        window = Display(environment)
 
     def update_func(delta, elapsed):
         environment.update(delta, elapsed)
@@ -210,6 +227,51 @@ def speed_test(args):
     print('Processing {} frames took {} seconds'.format(n, dur))
     print('Speed of {} fps'.format(mul))
 
+def human_player(args):
+    '''
+    Run the environment, letting a human control the drone
+    '''
+    if args.num_targets != None:
+        cfg.MISSION_NUM_TARGETS = args.num_targets
+
+    if args.num_obstacles != None:
+        cfg.MISSION_NUM_OBSTACLES = args.num_obstacles
+
+    if args.target_spawn_radius != None:
+        cfg.MISSION_TARGET_SPAWN_RADIUS = args.target_spawn_radius
+
+    if args.obstacle_spawn_radius != None:
+        cfg.MISSION_OBSTACLE_SPAWN_RADIUS = args.obstacle_spawn_radius
+
+
+    import roombasim.pittras.config
+    cfg.load(roombasim.pittras.config)
+
+    # setup mission
+    environment = Environment()
+    environment.reset()
+
+    # setup agent
+    agent = cfg.AGENT([1.5,1.5], 0)
+    environment.agent = agent
+
+    config = pyglet.gl.Config(sample_buffers=1, samples=4)
+    if args.timescale:
+        window = Display(environment, args.timescale)
+    else:
+        window = Display(environment)
+
+    from roombasim.pittras.ai import MouseController
+    mouse_controller = MouseController()
+    window.set_click_callback(mouse_controller.mouse_callback)
+
+    def update_func(delta, elapsed):
+        environment.update(delta, elapsed)
+        mouse_controller.frame_update(delta, elapsed, environment)
+
+    window.set_update_func(update_func)
+
+    pyglet.app.run()
 
 if __name__ == '__main__':
     main()
