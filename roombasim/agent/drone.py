@@ -84,6 +84,8 @@ class Drone(object):
         - z_vel : a value containing the target z velocity
         '''
         self.xy_accel = np.array(xy_accel, dtype=np.float64)
+
+        # Make sure acceleration is within drone limits
         if np.linalg.norm(self.xy_accel) > cfg.DRONE_MAX_HORIZ_ACCEL:
             self.xy_accel *= (cfg.DRONE_MAX_HORIZ_ACCEL
                             / np.linalg.norm(self.xy_accel))
@@ -91,6 +93,8 @@ class Drone(object):
         self.yaw_vel = yaw_vel
 
         self.z_vel = z_vel
+
+        # Make sure z velocity is within drone limits
         if np.abs(self.z_vel) > cfg.DRONE_MAX_VERTICAL_VELOCITY:
             self.z_vel = np.copysign(cfg.DRONE_MAX_VERTICAL_VELOCITY,
                                      self.z_vel)
@@ -124,9 +128,12 @@ class Drone(object):
             self._frame_accel = rot_matrix.dot(self.xy_accel)
 
             self.xy_vel += self._frame_accel * delta
+
+            # Make sure drone velocity is within limits
             if np.linalg.norm(self.xy_vel) > cfg.DRONE_MAX_HORIZ_VELOCITY:
                 self.xy_vel *= (cfg.DRONE_MAX_HORIZ_VELOCITY
                               / np.linalg.norm(self.xy_vel))
+
             self.xy_pos += self.xy_vel * delta
 
     # The following functions should be implemented by
