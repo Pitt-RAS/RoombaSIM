@@ -13,3 +13,5 @@ from .hold_position_demo_controller import HoldPositionDemoController
 from .hard_landing_demo_controller import HardLandingDemoController
 from .velocity_demo_controller import VelocityDemoController
 from .mouse_controller import MouseController
+
+from .greedy_herding_v1 import GreedyHerdingV1

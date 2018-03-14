@@ -33,7 +33,10 @@ class RoombaState(State):
                 if isinstance(r, TargetRoomba):
                     target_roombas[r.tag] = {
                         'pos': r.pos,
-                        'heading': r.heading
+                        'heading': r.heading,
+
+                        # temporary
+                        'reverse_timer': r.timers['reverse']
                     }
                 elif isinstance(r, ObstacleRoomba):
                     obstacle_roombas[r.tag] = {

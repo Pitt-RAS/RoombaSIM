@@ -16,6 +16,8 @@ import roombasim.config as cfg
 from roombasim.environment import roomba
 from roombasim import geometry
 
+import random
+
 class Environment(object):
     '''
     A class to represent a game round.

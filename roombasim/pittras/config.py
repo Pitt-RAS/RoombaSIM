@@ -26,7 +26,9 @@ TASKS = {
     'HitRoombaTask': HitRoombaTask,
     'LandTask': LandTask,
     'BlockRoombaTask': BlockRoombaTask,
-    'VelocityTask': VelocityTask
+    'VelocityTask': VelocityTask,
+    'SearchTask': SearchTask,
+    'BlockTask': BlockTask
 }
 
 STATES = {
@@ -101,7 +103,7 @@ PITTRAS_HIT_ROOMBA_MAX_START_DIST = 0.5
 PITTRAS_HIT_DESCENT_VELOCITY = -0.2
 
 PITTRAS_BLOCK_DESCENT_VEL = -0.4
-PITTRAS_BLOCK_FLOOR_TIME = 1.5
+PITTRAS_BLOCK_FLOOR_TIME = 3
 PITTRAS_HIT_ROOMBA_DESCENT_VELOCITY = -0.4
 PITTRAS_HIT_ROOMBA_FLOOR_TIME = 0.2
 
