@@ -48,8 +48,9 @@ class Display(pyglet.window.Window):
 
     def _update(self, dt):
         if not self._paused:
+            dt *= self._timescale
             self._elapsed += dt * 1000
-            self.update_func(self._timescale*dt, self._timescale*self._elapsed)
+            self.update_func(dt, self._elapsed)
 
     def on_resize(self, width, height):
         glViewport(10, 10, width-20, height-20)
@@ -81,7 +82,8 @@ class Display(pyglet.window.Window):
             else:
                 Display._draw_obstacle_roomba(r)
 
-        Display._draw_drone(self.environment.agent)
+        if self.environment.agent is not None:
+            Display._draw_drone(self.environment.agent)
 
     def on_mouse_release(self, x, y, button, modifiers):
         x = (x - 10) * 20.0 / (self.get_size()[0] - 20.0)
