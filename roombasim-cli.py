@@ -212,11 +212,12 @@ def speed_test(args):
 
     start = time.time()
 
+    dt = 1/60.
     i = 0
     el = 0
     while i < n:
-        el += 1/60.
-        e.update(1/60., el)
+        el += dt
+        e.update(dt, 1000 * el)
         i += 1
 
     end = time.time()
