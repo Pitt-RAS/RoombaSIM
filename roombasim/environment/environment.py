@@ -102,14 +102,16 @@ class Environment(object):
             rba.update(delta, elapsed)
 
             # Perform roomba-to-roomba collision detection
-            for j in range(len(self.roombas)):
-                # ignore self collisions and collisions with roombas that left
-                if i == j or self.roombas[j].state == cfg.ROOMBA_STATE_IDLE:
+            for j in range(i + 1, len(self.roombas)):
+                # ignore collisions with roombas that left
+                if self.roombas[j].state == cfg.ROOMBA_STATE_IDLE:
                     continue
 
                 if Environment._check_roomba_collision(rba, self.roombas[j]):
                     if Environment._check_roomba_is_facing(rba, self.roombas[j].pos):
                         rba.collisions['front'] = True
+                    if Environment._check_roomba_is_facing(self.roombas[j], rba.pos):
+                        self.roombas[j].collisions['front'] = True
 
             # Perform drone-to-roomba collision detection
             if self.agent.is_touching_roomba_top(rba):
