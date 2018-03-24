@@ -81,7 +81,8 @@ class Display(pyglet.window.Window):
             else:
                 Display._draw_obstacle_roomba(r)
 
-        Display._draw_drone(self.environment.agent)
+        if self.environment.agent is not None:
+            Display._draw_drone(self.environment.agent)
 
     def on_mouse_release(self, x, y, button, modifiers):
         x = (x - 10) * 20.0 / (self.get_size()[0] - 20.0)
