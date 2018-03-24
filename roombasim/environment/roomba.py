@@ -36,7 +36,7 @@ class Roomba(object):
         heading - angle in radians (0 is +x and pi/2 is +y)
         [tag] - an optional identification element
         '''
-        self.pos = pos
+        self.pos = np.array(pos)
         self.heading = heading
         self.tag = tag
 

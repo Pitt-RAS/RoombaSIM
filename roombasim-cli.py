@@ -5,7 +5,10 @@ roombasim.py
 CLI interface for various functions.
 '''
 
+from __future__ import print_function
+
 import argparse
+import numpy as np
 import time
 import pyglet
 
@@ -37,6 +40,10 @@ def main():
     speedtest_parser = subparsers.add_parser('speedtest')
     speedtest_parser.add_argument('-frames', type=int, default=1000)
 
+    nographics_parser = subparsers.add_parser('nographics')
+    nographics_parser.add_argument('-rounds', type=int, default=1)
+    nographics_parser.add_argument('-stats_file', type=str, default='stats.txt')
+
     keydemo_parser = subparsers.add_parser('keydemo')
 
     hmi_parser = subparsers.add_parser('human_player')
@@ -54,6 +61,8 @@ def main():
         run_demo(args)
     elif args.command == 'speedtest':
         speed_test(args)
+    elif args.command == 'nographics':
+        nographics_test(args)
     elif args.command == 'keydemo':
         keyboard_demo(args)
     elif args.command == 'human_player':
@@ -227,6 +236,39 @@ def speed_test(args):
 
     print('Processing {} frames took {} seconds'.format(n, dur))
     print('Speed of {} fps'.format(mul))
+
+def nographics_test(args):
+    import roombasim.pittras.config
+    cfg.load(roombasim.pittras.config)
+
+    n = args.rounds
+
+    print('Starting {} rounds'.format(n))
+
+    e = Environment()
+
+    good_exits = []
+    bad_exits = []
+    scores = []
+
+    for i in range(n):
+        e.reset()
+
+        print('Round {}'.format(i))
+
+        for elapsed in np.arange(0, 10*60, 1/60.):
+            e.update(1/60., 1000 * elapsed)
+
+        good_exits.append(e.good_exits)
+        bad_exits.append(e.bad_exits)
+        scores.append(e.score)
+
+    with open(args.stats_file, 'w') as f:
+        f.write(', '.join(map(str, good_exits)) + '\n')
+        f.write(', '.join(map(str, bad_exits)) + '\n')
+        f.write(', '.join(map(str, scores)) + '\n')
+
+    print('Done')
 
 def human_player(args):
     '''
