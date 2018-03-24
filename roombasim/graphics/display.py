@@ -48,8 +48,9 @@ class Display(pyglet.window.Window):
 
     def _update(self, dt):
         if not self._paused:
+            dt *= self._timescale
             self._elapsed += dt * 1000
-            self.update_func(self._timescale*dt, self._timescale*self._elapsed)
+            self.update_func(dt, self._elapsed)
 
     def on_resize(self, width, height):
         glViewport(10, 10, width-20, height-20)
